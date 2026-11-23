@@ -256,6 +256,31 @@ class RunnerTests(unittest.TestCase):
                 with self.assertRaisesRegex(RuntimeError, "requires an mmproj"):
                     run.load_catalog()
 
+    def test_models_lists_every_model_and_copy_paste_commands(self):
+        output = io.StringIO()
+        with patch("run.ensure_runtime", side_effect=AssertionError("network attempted")), \
+             patch("sys.stdout", output), \
+             patch.object(sys, "argv", ["run.py", "--models"]):
+            self.assertEqual(run.main(), 0)
+        listing = output.getvalue()
+        for model_id in (
+            "granite-350m", "smollm2-135m", "smollm2-360m",
+            "smolvlm2-256m", "qwen2.5-0.5b"
+        ):
+            self.assertIn("python run.py {}".format(model_id), listing)
+        self.assertIn("smolvlm2-256m", listing)
+        self.assertIn("--image photo.jpg", listing)
+
+    def test_model_checksums_and_direct_urls(self):
+        models = run.load_catalog()
+        for model_id, model in models.items():
+            with self.subTest(model=model_id):
+                self.assertEqual(len(model["sha256"]), 64)
+                self.assertTrue(model["url"].startswith("https://"))
+                if model["type"] == "vision":
+                    self.assertEqual(len(model["mmproj"]["sha256"]), 64)
+                    self.assertTrue(model["mmproj"]["url"].startswith("https://"))
+
     def test_no_network_for_list(self):
         with patch("run.ensure_runtime", side_effect=AssertionError("network attempted")), \
              patch.object(sys, "argv", ["run.py", "--list"]):
