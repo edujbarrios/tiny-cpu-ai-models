@@ -14,5 +14,63 @@
     ],
     "runtime": "llama.cpp",
     "context_size": 2048
+  },
+  "smollm2-135m": {
+    "name": "SmolLM2 135M Instruct (Q4_K_M)",
+    "type": "text",
+    "runtime": "llama.cpp",
+    "parameters": "135M",
+    "license": "Apache-2.0",
+    "source": "QuantFactory/SmolLM2-135M-Instruct-GGUF (based on HuggingFaceTB/SmolLM2-135M-Instruct)",
+    "filename": "SmolLM2-135M-Instruct.Q4_K_M.gguf",
+    "url": "https://huggingface.co/QuantFactory/SmolLM2-135M-Instruct-GGUF/resolve/main/SmolLM2-135M-Instruct.Q4_K_M.gguf",
+    "sha256": "8030f04528538d47bda434f6f0bdf3952c40a58123e4d5e755332f23731a8684",
+    "size_mb": 105,
+    "context_size": 2048
+  },
+  "smollm2-360m": {
+    "name": "SmolLM2 360M Instruct (Q4_K_M)",
+    "type": "text",
+    "runtime": "llama.cpp",
+    "parameters": "360M",
+    "license": "Apache-2.0",
+    "source": "lmstudio-community/SmolLM2-360M-Instruct-GGUF (based on HuggingFaceTB/SmolLM2-360M-Instruct)",
+    "filename": "SmolLM2-360M-Instruct-Q4_K_M.gguf",
+    "url": "https://huggingface.co/lmstudio-community/SmolLM2-360M-Instruct-GGUF/resolve/main/SmolLM2-360M-Instruct-Q4_K_M.gguf",
+    "sha256": "e55c2a5df7f8f6eed1a843ff709fa8008dbce65d82e57c5c06dec5ee8d060415",
+    "size_mb": 271,
+    "context_size": 2048
+  },
+  "smolvlm2-256m": {
+    "name": "SmolVLM2 256M Video Instruct (Q4_K_M)",
+    "type": "vision",
+    "runtime": "llama.cpp",
+    "parameters": "256M",
+    "license": "Apache-2.0",
+    "source": "ggml-org/SmolVLM2-256M-Video-Instruct-GGUF (based on HuggingFaceTB/SmolVLM2-256M-Video-Instruct)",
+    "filename": "SmolVLM2-256M-Video-Instruct-Q4_K_M.gguf",
+    "url": "https://huggingface.co/ggml-org/SmolVLM2-256M-Video-Instruct-GGUF/resolve/main/SmolVLM2-256M-Video-Instruct-Q4_K_M.gguf",
+    "sha256": "159de7db92a9f5817c05ed2527fc7ca223939e7cca06589051fc34d5dca1cffa",
+    "size_mb": 131,
+    "context_size": 4096,
+    "mmproj": {
+      "filename": "mmproj-SmolVLM2-256M-Video-Instruct-Q8_0.gguf",
+      "url": "https://huggingface.co/ggml-org/SmolVLM2-256M-Video-Instruct-GGUF/resolve/main/mmproj-SmolVLM2-256M-Video-Instruct-Q8_0.gguf",
+      "sha256": "05d5751132244a6ebd64cba9b34898c0d874b2cb78159d758e1d4da3aad91581",
+      "size_mb": 104
+    }
+  },
+  "qwen2.5-0.5b": {
+    "name": "Qwen2.5 0.5B Instruct (Q4_K_M)",
+    "type": "text",
+    "runtime": "llama.cpp",
+    "parameters": "500M",
+    "license": "Apache-2.0",
+    "source": "Qwen/Qwen2.5-0.5B-Instruct-GGUF (official GGUF)",
+    "filename": "qwen2.5-0.5b-instruct-q4_k_m.gguf",
+    "url": "https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/main/qwen2.5-0.5b-instruct-q4_k_m.gguf",
+    "sha256": "74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db",
+    "size_mb": 491,
+    "context_size": 2048
   }
 }
