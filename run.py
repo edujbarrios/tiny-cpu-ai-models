@@ -287,15 +287,27 @@ def resolve_model(models, model_id):
     )
 
 
+def example_command(model_id, spec):
+    """Generate a copy-and-paste CLI example from the model registry."""
+    if spec["type"] == "vision":
+        return 'python run.py {} "Describe this image." --image photo.jpg'.format(model_id)
+    return 'python run.py {} "Tell me something interesting."'.format(model_id)
+
+
 def list_models(models):
-    print("Available models:")
+    """List models with runnable commands (no network access required)."""
+    print("Available models (CPU only):")
+    print()
     for model_id, spec in models.items():
         aliases = spec.get("aliases", [])
-        alias_text = " (aliases: {})".format(", ".join(aliases)) if aliases else ""
-        print("  {}{} - {} | {} | {}".format(
-            model_id, alias_text, spec["name"],
-            spec["parameters"], spec["type"]
+        alias_text = " | aliases: {}".format(", ".join(aliases)) if aliases else ""
+        print("{} | {} | {} | {}{}".format(
+            model_id, spec["parameters"], spec["type"], spec["name"], alias_text
         ))
+        print("  Run: {}".format(example_command(model_id, spec)))
+        if spec["type"] == "vision":
+            print("  Note: Replace photo.jpg with an existing image file.")
+        print()
 
 
 def build_command(engine, model, weights, prompt, args, projector=None):
@@ -363,7 +375,8 @@ def main():
     )
     parser.add_argument("model", nargs="?", metavar="MODEL_ID", help="Model ID from models.json")
     parser.add_argument("prompt", nargs="*", metavar="PROMPT", help="Text prompt (omit for interactive chat)")
-    parser.add_argument("--list", action="store_true", help="List all registered models")
+    parser.add_argument("--models", "--list", dest="list", action="store_true",
+                        help="List all models with copy-and-paste test commands")
     parser.add_argument("--offline", action="store_true", help="Never download any files")
     parser.add_argument("--image", metavar="PATH", help="Image path (vision models only)")
     parser.add_argument("--max-tokens", type=int, default=192, help="Maximum output tokens")
