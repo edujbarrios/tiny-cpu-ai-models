@@ -39,8 +39,10 @@ def main(model_id):
     cmd = [
         sys.executable, str(root / "run.py"),
         model_id,
-        "Describe this image in one short sentence." if is_vision
-        else "Reply in one short sentence: what is a CPU?",
+        models[model_id].get("smoke_prompt", (
+            "Describe this image in one short sentence." if is_vision
+            else "Reply in one short sentence: what is a CPU?"
+        )),
         "--max-tokens", "48",
     ]
     with tempfile.TemporaryDirectory() as temp:
