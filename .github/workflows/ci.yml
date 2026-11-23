@@ -39,6 +39,18 @@ jobs:
           python run.py granite-350m --offline --max-tokens 24 "Reply with only one word: goodbye"
 
 
+  smoke-lfm2-windows:
+    name: LFM2-VL 450M image inference (Windows CPU)
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Download and infer with LFM2-VL on CPU
+        run: python tests/smoke_models.py lfm2-vl-450m
+
   smoke-more-models:
     name: CPU smoke test (${{ matrix.model }})
     runs-on: ubuntu-latest
