@@ -266,11 +266,12 @@ class RunnerTests(unittest.TestCase):
         listing = output.getvalue()
         for model_id in (
             "granite-350m", "smollm2-135m", "smollm2-360m",
-            "smolvlm2-256m", "qwen2.5-0.5b"
+            "pythia-160m", "smolvlm2-256m", "qwen2.5-0.5b"
         ):
             self.assertIn("python run.py {}".format(model_id), listing)
         self.assertIn("smolvlm2-256m", listing)
         self.assertIn("--image benchmark_image/example.png", listing)
+        self.assertIn('python run.py pythia-160m "Artificial intelligence is"', listing)
         self.assertIn("Text models:", listing)
         self.assertIn("Vision models:", listing)
 
