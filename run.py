@@ -20,7 +20,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 CACHE = ROOT / ".cache"
 CATALOG = ROOT / "models.json"
-RELEASES_URL = "https://api.github.com/repos/ggml-org/llama.cpp/releases?per_page=5"
+RUNTIMES = ROOT / "runtimes.json"
 USER_AGENT = "tiny-cpu-ai-models/0.1 (CPU-only, no-hf-cli)"
 
 
@@ -32,11 +32,6 @@ def request(url):
     if not url.startswith("https://"):
         raise RuntimeError("Only HTTPS downloads are allowed.")
     return urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
-
-
-def get_json(url):
-    with urllib.request.urlopen(request(url), timeout=45) as response:
-        return json.load(response)
 
 
 def file_sha256(path):
@@ -99,22 +94,6 @@ def platform_archive_suffix():
     if system == "windows":
         return system + "-" + arch, "-bin-win-cpu-" + arch + ".zip"
     raise RuntimeError("Unsupported operating system: " + system)
-
-
-def select_asset(releases, suffix):
-    """Select official llama.cpp CPU-only archives, never GPU-specific packages."""
-    for release in releases:
-        for asset in release.get("assets", []):
-            name = asset.get("name", "")
-            if name.startswith("llama-") and name.endswith(suffix):
-                digest = asset.get("digest", "")
-                if not digest.startswith("sha256:"):
-                    continue
-                return asset["browser_download_url"], digest.removeprefix("sha256:")
-    raise RuntimeError(
-        "No verifiable llama.cpp CPU binary was found for " + suffix
-        + ". See https://github.com/ggml-org/llama.cpp/releases"
-    )
 
 
 def _inside(root, name):
@@ -183,23 +162,41 @@ def find_cli(directory):
     return None
 
 
+def load_runtimes():
+    """Read a pinned CPU runtime manifest without calling the GitHub API."""
+    with RUNTIMES.open("r", encoding="utf-8") as source:
+        return json.load(source)
+
+
 def ensure_runtime(offline=False):
-    platform_key, suffix = platform_archive_suffix()
-    install_dir = CACHE / "runtime" / platform_key
+    platform_key, _ = platform_archive_suffix()
+    entry = load_runtimes()["llama.cpp"]
+    version = entry["version"]
+    asset = entry["platforms"].get(platform_key)
+    if not asset:
+        raise RuntimeError(
+            "No prebuilt CPU runtime for {}. See {}".format(
+                platform_key, entry["source"]
+            )
+        )
+    install_dir = CACHE / "runtime" / version / platform_key
     binary = find_cli(install_dir)
     if binary:
         return binary
     if offline:
         raise RuntimeError("No local runtime found. Run once without --offline.")
 
-    info("Preparing llama.cpp CPU runtime...")
-    url, checksum = select_asset(get_json(RELEASES_URL), suffix)
+    info("Preparing llama.cpp {} CPU runtime...".format(version))
     CACHE.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix="llama-", dir=CACHE) as workspace:
         workspace = Path(workspace)
-        extension = ".zip" if suffix.endswith(".zip") else ".tar.gz"
-        archive = workspace / ("llama" + extension)
-        download(url, archive, checksum)
+        filename = asset["filename"]
+        if filename != Path(filename).name or not (
+            filename.endswith(".zip") or filename.endswith(".tar.gz")
+        ):
+            raise RuntimeError("Invalid CPU runtime archive name in runtimes.json.")
+        archive = workspace / filename
+        download(asset["url"], archive, asset["sha256"])
         extracted = workspace / "extracted"
         unpack(archive, extracted)
         binary = find_cli(extracted)
