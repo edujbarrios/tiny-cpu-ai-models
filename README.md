@@ -86,7 +86,6 @@ python run.py qwen2.5-0.5b "Tell me something interesting."
 | Model ID | Model | Parameters | Quantization | Download size | License |
 | --- | --- | ---: | --- | --- | --- |
 | `smolvlm2-256m` | [SmolVLM2 256M Video Instruct](https://huggingface.co/HuggingFaceTB/SmolVLM2-256M-Video-Instruct) | 256M | Q4_K_M | 131 MB model + 104 MB projector | Apache-2.0 |
-| `moondream-2b` | [Moondream2 (~2B; 2025-04-14)](https://huggingface.co/ggml-org/moondream2-20250414-GGUF) | ~2B | F16 | 2.84 GB model + 910 MB projector | Apache-2.0 |
 
 
 **Research candidate — not yet runnable:**
@@ -94,8 +93,9 @@ python run.py qwen2.5-0.5b "Tell me something interesting."
 | Model ID | Model | Parameters | Format available | Status |
 | --- | --- | ---: | --- | --- |
 | `moondream-0.5b` | [Moondream 0.5B](https://moondream.ai/models) | 500M | [ONNX](https://huggingface.co/whistleroosh/moondream-0.5B/tree/main) | Research only: no verified llama.cpp-compatible GGUF + visual projector for this launcher |
+| `moondream-2b` | [Moondream2 (2025-04-14)](https://huggingface.co/ggml-org/moondream2-20250414-GGUF) | ~2B | [F16 GGUF + projector](https://huggingface.co/ggml-org/moondream2-20250414-GGUF/tree/main), ~3.75 GB | Research only: pinned llama.cpp runtime fails actual image tokenization |
 
-Moondream 0.5B is interesting for edge deployment and task-specific fine-tuning, but it **cannot yet be launched via `python run.py moondream-0.5b`**. It appears in `--models` clearly marked as research-only. Do not attempt a fake GGUF download or install extra frameworks silently.
+Moondream 0.5B is interesting for edge deployment and task-specific fine-tuning but does not yet have a verified compatible GGUF/projector pair. Moondream2 has published GGUF files, but image inference with the pinned llama.cpp runtime fails with a media-marker tokenization error. **Neither model is advertised as executable** in `--models` until the integration passes a real image-inference test. The catalog retains their metadata for future research.
 
 #### Visual recognition benchmark
 
@@ -107,10 +107,9 @@ Moondream 0.5B is interesting for edge deployment and task-specific fine-tuning,
 
 ```bash
 python run.py smolvlm2-256m "Describe the main object, its color, shape, and setting." --image benchmark_image/example.png
-python run.py moondream-2b "Describe the main object, its color, shape, and setting." --image benchmark_image/example.png
 ```
 
-The vision model and its visual projector are downloaded automatically. Moondream2 is significantly larger and may require several gigabytes of RAM; its 2025 F16 conversion is provided as an experimental CPU option. For a fair comparison, use this image and the exact prompt above.
+The validated SmolVLM2 vision model and its projector are downloaded automatically. For a fair comparison, use the benchmark image and the exact prompt above.
 
 #### Tested CPU performance — vision
 
@@ -120,7 +119,7 @@ The vision model and its visual projector are downloaded automatically. Moondrea
 
 The model recognized the blue object, rock and grassy background, but classified the blue lemon as a **ball** rather than a lemon. The output above is from the provided Intel Core i7-1165G7 CPU test.
 
-**Download provenance:** Granite and Qwen use publisher-hosted GGUF repositories. SmolLM2 variants use quantizations published by QuantFactory and LM Studio Community; SmolVLM2 GGUF and projector come from ggml-org, while the Moondream2 2025 F16 GGUF and matching projector come from ggml-org. All downloads use HTTPS with SHA-256 verification, and no Hugging Face software installation is required. The `granite` alias still resolves to `granite-350m`.
+**Download provenance:** Granite and Qwen use publisher-hosted GGUF repositories. SmolLM2 variants use quantizations published by QuantFactory and LM Studio Community; SmolVLM2 GGUF and projector come from ggml-org, while the experimental Moondream2 2025 F16 GGUF and matching projector come from ggml-org. All downloads use HTTPS with SHA-256 verification, and no Hugging Face software installation is required. The `granite` alias still resolves to `granite-350m`.
 
 ## Adding another model
 
