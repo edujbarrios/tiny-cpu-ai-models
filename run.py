@@ -288,25 +288,34 @@ def resolve_model(models, model_id):
 
 
 def example_command(model_id, spec):
-    """Generate a copy-and-paste CLI example from the model registry."""
+    """Create a runnable example for every model from the catalog."""
     if spec["type"] == "vision":
-        return 'python run.py {} "Describe this image." --image photo.jpg'.format(model_id)
+        return (
+            'python run.py {} "Describe the main object, its color, '
+            'shape, and setting." --image benchmark_image/example.png'
+        ).format(model_id)
     return 'python run.py {} "Tell me something interesting."'.format(model_id)
 
 
 def list_models(models):
-    """List models with runnable commands (no network access required)."""
+    """List text and vision models separately, without network access."""
     print("Available models (CPU only):")
-    print()
-    for model_id, spec in models.items():
-        aliases = spec.get("aliases", [])
-        alias_text = " | aliases: {}".format(", ".join(aliases)) if aliases else ""
-        print("{} | {} | {} | {}{}".format(
-            model_id, spec["parameters"], spec["type"], spec["name"], alias_text
-        ))
-        print("  Run: {}".format(example_command(model_id, spec)))
-        if spec["type"] == "vision":
-            print("  Note: Replace photo.jpg with an existing image file.")
+    for model_type, heading in (("text", "Text models"), ("vision", "Vision models")):
+        entries = [
+            (model_id, spec) for model_id, spec in models.items()
+            if spec["type"] == model_type
+        ]
+        if not entries:
+            continue
+        print()
+        print(heading + ":")
+        for model_id, spec in entries:
+            aliases = spec.get("aliases", [])
+            alias_text = " | aliases: {}".format(", ".join(aliases)) if aliases else ""
+            print("  {} | {} | {}{}".format(
+                model_id, spec["parameters"], spec["name"], alias_text
+            ))
+            print("    Run: {}".format(example_command(model_id, spec)))
         print()
 
 
