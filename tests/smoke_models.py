@@ -61,7 +61,7 @@ def main(model_id):
         if models[model_id].get("inference_mode") == "completion":
             rates = re.findall(
                 r"eval time\s*=\s*[0-9.]+\s*ms\s*/\s*[0-9]+\s*runs\s*"
-                r"\(\s*([0-9.]+)\s*tokens per second",
+                r"\([^)]*?,\s*([0-9.]+)\s*tokens per second",
                 result.stdout,
             )
         else:
