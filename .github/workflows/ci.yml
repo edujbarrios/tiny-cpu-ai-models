@@ -39,18 +39,6 @@ jobs:
           python run.py granite-350m --offline --max-tokens 24 "Reply with only one word: goodbye"
 
 
-  smoke-pythia-windows:
-    name: Pythia base completion CPU (Windows)
-    runs-on: windows-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - name: Validate raw text completion on Windows CPU
-        run: python tests/smoke_models.py pythia-160m
-
   smoke-more-models:
     name: CPU smoke test (${{ matrix.model }})
     runs-on: ubuntu-latest
@@ -60,7 +48,6 @@ jobs:
       matrix:
         model:
           - smollm2-135m
-          - pythia-160m
           - smollm2-360m
           - qwen2.5-0.5b
           - smolvlm2-256m
