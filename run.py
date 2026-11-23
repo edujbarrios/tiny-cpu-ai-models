@@ -344,7 +344,7 @@ def main():
     parser.add_argument("--ctx-size", type=int, default=None, help="Context size in tokens")
     parser.add_argument("--threads", type=int, default=None, help="Number of CPU threads")
     parser.add_argument("--model", dest="legacy_model", default=None, help=argparse.SUPPRESS)
-    args = parser.parse_args()
+    args = parser.parse_intermixed_args()
 
     if (
         args.max_tokens <= 0
