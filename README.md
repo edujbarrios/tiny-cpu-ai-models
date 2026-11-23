@@ -50,17 +50,18 @@ Omit the prompt for interactive chat. `--offline` disables downloads after the m
 python run.py --models
 ```
 
-This prints every registered model with a **ready-to-copy test command**. The following models can be downloaded directly through the runner (no Hugging Face installation or Ollama required):
+The catalog separates **text** and **vision** models and prints a ready-to-copy command for each one.
 
-| Model ID | Model | Parameters | Type | Quantization | Download size | License |
-| --- | --- | ---: | --- | --- | ---: | --- |
-| `granite-350m` | [IBM Granite 4.0 350M](https://huggingface.co/ibm-granite/granite-4.0-350m) | 350M | Text | Q4_K_M | 237 MB | Apache-2.0 |
-| `smollm2-135m` | [SmolLM2 135M Instruct](https://huggingface.co/HuggingFaceTB/SmolLM2-135M-Instruct) | 135M | Text | Q4_K_M | 105 MB | Apache-2.0 |
-| `smollm2-360m` | [SmolLM2 360M Instruct](https://huggingface.co/HuggingFaceTB/SmolLM2-360M-Instruct) | 360M | Text | Q4_K_M | 271 MB | Apache-2.0 |
-| `smolvlm2-256m` | [SmolVLM2 256M Video Instruct](https://huggingface.co/HuggingFaceTB/SmolVLM2-256M-Video-Instruct) | 256M | Vision | Q4_K_M | 131 MB model + 104 MB projector | Apache-2.0 |
-| `qwen2.5-0.5b` | [Qwen2.5 0.5B Instruct](https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct) | 500M | Text | Q4_K_M | 491 MB | Apache-2.0 |
+### Text models
 
-### Tested CPU performance
+| Model ID | Model | Parameters | Quantization | Download size | License |
+| --- | --- | ---: | --- | ---: | --- |
+| `granite-350m` | [IBM Granite 4.0 350M](https://huggingface.co/ibm-granite/granite-4.0-350m) | 350M | Q4_K_M | 237 MB | Apache-2.0 |
+| `smollm2-135m` | [SmolLM2 135M Instruct](https://huggingface.co/HuggingFaceTB/SmolLM2-135M-Instruct) | 135M | Q4_K_M | 105 MB | Apache-2.0 |
+| `smollm2-360m` | [SmolLM2 360M Instruct](https://huggingface.co/HuggingFaceTB/SmolLM2-360M-Instruct) | 360M | Q4_K_M | 271 MB | Apache-2.0 |
+| `qwen2.5-0.5b` | [Qwen2.5 0.5B Instruct](https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct) | 500M | Q4_K_M | 491 MB | Apache-2.0 |
+
+#### Tested CPU performance — text
 
 | Model | CPU | Quantization | Prompt processing | Generation speed | Response time |
 | --- | --- | --- | ---: | ---: | ---: |
@@ -69,21 +70,44 @@ This prints every registered model with a **ready-to-copy test command**. The fo
 | `smollm2-360m` | Intel Core i7-1165G7 (Tiger Lake, 4 cores / 8 threads, up to 4.7 GHz) | Q4_K_M | 232.8 tok/s | 38.4 tok/s | 1.50 s |
 | `qwen2.5-0.5b` | Intel Core i7-1165G7 (Tiger Lake, 4 cores / 8 threads, up to 4.7 GHz) | Q4_K_M | 180.4 tok/s | 30.9 tok/s | 3.62 s |
 
-### Run each model
+#### Run a text model
 
 ```bash
 python run.py granite-350m "Tell me something interesting."
 python run.py smollm2-135m "Tell me something interesting."
 python run.py smollm2-360m "Tell me something interesting."
 python run.py qwen2.5-0.5b "Tell me something interesting."
-python run.py smolvlm2-256m "Describe this image." --image photo.jpg
 ```
 
-For the vision example, replace `photo.jpg` with the path to an image on your computer. The visual projector is downloaded automatically when needed. The SmolVLM2 variant was trained for video and images; this launcher currently exposes **single-image** inference, not a video-processing flag.
+### Vision models
 
-**Download provenance:** Granite and Qwen use their publishers' GGUF repositories. SmolLM2 GGUFs come from third-party quantizations published by QuantFactory and LM Studio Community. SmolVLM2 GGUF and projector come from ggml-org. The `models.json` manifest includes direct HTTPS links and published SHA-256 checksums for all files. GGUF hosting does **not** mean Hugging Face software is installed.
+| Model ID | Model | Parameters | Quantization | Download size | License |
+| --- | --- | ---: | --- | --- | --- |
+| `smolvlm2-256m` | [SmolVLM2 256M Video Instruct](https://huggingface.co/HuggingFaceTB/SmolVLM2-256M-Video-Instruct) | 256M | Q4_K_M | 131 MB model + 104 MB projector | Apache-2.0 |
 
-The entry `granite` remains an alias for `granite-350m`. Registration confirms that the source files and their checksums are available; it does not imply that every combination of CPU/OS and model has been benchmarked.
+#### Visual recognition benchmark
+
+![Blue lemon-shaped object on a stone in a green meadow](benchmark_image/example.png)
+
+**Reference description (ground truth supplied by the image creator):** A bright blue lemon, deliberately textured to resemble a golf ball, resting on a rock in a sunny green meadow. The unusual color and hybrid appearance are intended to challenge visual object recognition. **The correct identification is a blue lemon, not a golf ball.**
+
+**Benchmark prompt (English):** `Describe the main object, its color, shape, and setting.`
+
+```bash
+python run.py smolvlm2-256m "Describe the main object, its color, shape, and setting." --image benchmark_image/example.png
+```
+
+The vision model and its visual projector are downloaded automatically. For a fair comparison, use this image and the exact prompt above.
+
+#### Tested CPU performance — vision
+
+| Model | Benchmark image | Reference identity | Actual model response | CPU | Prompt processing | Generation speed | Response time |
+| --- | --- | --- | --- | --- | ---: | ---: | ---: |
+| `smolvlm2-256m` | [example.png](benchmark_image/example.png) | Blue lemon shaped/textured like a golf ball, on a rock in a meadow | *Not yet reported* | Intel Core i7-1165G7 (Tiger Lake; planned test) | — | — | — |
+
+The table will include the **model's verbatim answer** and its measured CPU timings when the benchmark has been run on the specified CPU. A prior Linux CI image smoke test verified that inference works, but is **not** a measurement of this image or the Intel i7-1165G7.
+
+**Download provenance:** Granite and Qwen use publisher-hosted GGUF repositories. SmolLM2 variants use quantizations published by QuantFactory and LM Studio Community; SmolVLM2 GGUF and projector come from ggml-org. All downloads use HTTPS with SHA-256 verification, and no Hugging Face software installation is required. The `granite` alias still resolves to `granite-350m`.
 
 ## Adding another model
 
