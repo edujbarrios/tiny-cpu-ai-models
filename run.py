@@ -300,7 +300,9 @@ def example_command(model_id, spec):
             'python run.py {} "Describe the main object, its color, '
             'shape, and setting." --image benchmark_image/example.png'
         ).format(model_id)
-    return 'python run.py {} "Tell me something interesting."'.format(model_id)
+    return 'python run.py {} "{}"'.format(
+        model_id, spec.get("example_prompt", "Tell me something interesting.")
+    )
 
 
 def list_models(models):
