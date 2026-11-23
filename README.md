@@ -92,10 +92,9 @@ python run.py qwen2.5-0.5b "Tell me something interesting."
 
 | Model ID | Model | Parameters | Format available | Status |
 | --- | --- | ---: | --- | --- |
-| `moondream-0.5b` | [Moondream 0.5B](https://moondream.ai/models) | 500M | [ONNX](https://huggingface.co/whistleroosh/moondream-0.5B/tree/main) | Research only: no verified llama.cpp-compatible GGUF + visual projector for this launcher |
 | `moondream-2b` | [Moondream2 (2025-04-14)](https://huggingface.co/ggml-org/moondream2-20250414-GGUF) | ~2B | [F16 GGUF + projector](https://huggingface.co/ggml-org/moondream2-20250414-GGUF/tree/main), ~3.75 GB | Research only: pinned llama.cpp runtime fails actual image tokenization |
 
-Moondream 0.5B is interesting for edge deployment and task-specific fine-tuning but does not yet have a verified compatible GGUF/projector pair. Moondream2 has published GGUF files, but image inference with the pinned llama.cpp runtime fails with a media-marker tokenization error. **Neither model is advertised as executable** in `--models` until the integration passes a real image-inference test. The catalog retains their metadata for future research.
+Moondream2 has published GGUF files, but image inference with the pinned llama.cpp runtime fails with a media-marker tokenization error. It is listed as research-only in `--models`, without an executable command, until integration passes a real image-inference test.
 
 #### Visual recognition benchmark
 
