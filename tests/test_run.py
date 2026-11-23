@@ -1,4 +1,4 @@
-"""Pruebas sin GPU, red ni librerías externas para el lanzador."""
+"""Tests for the launcher without a GPU, network, or external libraries."""
 
 import hashlib
 import io
@@ -72,7 +72,7 @@ class RunnerTests(unittest.TestCase):
                 "url": "https://example.org/tiny.gguf",
             }
             with patch.object(run, "CACHE", Path(temp)):
-                with self.assertRaisesRegex(RuntimeError, "sin --offline"):
+                with self.assertRaisesRegex(RuntimeError, "without --offline"):
                     run.ensure_model(model, offline=True)
 
     def test_zip_path_traversal_is_rejected(self):
@@ -80,7 +80,7 @@ class RunnerTests(unittest.TestCase):
             archive = Path(temp) / "bad.zip"
             with zipfile.ZipFile(archive, "w") as package:
                 package.writestr("../../unsafe.txt", "malicious")
-            with self.assertRaisesRegex(RuntimeError, "inseguro"):
+            with self.assertRaisesRegex(RuntimeError, "Unsafe"):
                 run.unpack(archive, Path(temp) / "extract")
             self.assertFalse((Path(temp) / "unsafe.txt").exists())
 
@@ -92,7 +92,7 @@ class RunnerTests(unittest.TestCase):
                 member = tarfile.TarInfo("../../unsafe.txt")
                 member.size = len(content)
                 package.addfile(member, io.BytesIO(content))
-            with self.assertRaisesRegex(RuntimeError, "inseguro"):
+            with self.assertRaisesRegex(RuntimeError, "Unsafe"):
                 run.unpack(archive, Path(temp) / "extract")
 
     def test_command_is_cpu_only(self):
@@ -101,13 +101,13 @@ class RunnerTests(unittest.TestCase):
              patch("run.ensure_runtime", return_value=Path("/tmp/llama-cli")), \
              patch("run.ensure_model", return_value=Path("/tmp/granite.gguf")), \
              patch("run.subprocess.call", return_value=0) as call, \
-             patch.object(sys, "argv", ["run.py", "Hola", "--threads", "2"]):
+             patch.object(sys, "argv", ["run.py", "Hello", "--threads", "2"]):
             self.assertEqual(run.main(), 0)
         command = call.call_args.args[0]
         self.assertIn("--gpu-layers", command)
         self.assertEqual(command[command.index("--gpu-layers") + 1], "0")
         self.assertIn("--single-turn", command)
-        self.assertEqual(command[command.index("--prompt") + 1], "Hola")
+        self.assertEqual(command[command.index("--prompt") + 1], "Hello")
 
     def test_no_network_for_list(self):
         with patch("run.ensure_runtime", side_effect=AssertionError("network attempted")), \
