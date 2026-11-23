@@ -20,7 +20,7 @@ jobs:
       - name: Test standard-library runner
         run: python -m unittest discover -s tests -v
       - name: List models without network
-        run: python run.py --list
+        run: python run.py --models
 
   smoke-granite:
     name: Granite Q4 CPU integration
@@ -37,3 +37,23 @@ jobs:
       - name: Repeat without internet downloads
         run: |
           python run.py granite-350m --offline --max-tokens 24 "Reply with only one word: goodbye"
+
+  smoke-more-models:
+    name: CPU smoke test (${{ matrix.model }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        model:
+          - smollm2-135m
+          - smollm2-360m
+          - qwen2.5-0.5b
+          - smolvlm2-256m
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Download and run on CPU
+        run: python tests/smoke_models.py ${{ matrix.model }}
