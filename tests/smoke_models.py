@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """End-to-end smoke test for a registered model; Python standard library only."""
 
+import json
 import struct
 import subprocess
 import sys
@@ -27,15 +28,22 @@ def create_test_image(path, width=64, height=64):
 
 
 def main(model_id):
+    root = Path(__file__).resolve().parents[1]
+    models = json.loads((root / "models.json").read_text(encoding="utf-8"))
+    if model_id not in models:
+        raise SystemExit("Unknown model: " + model_id)
+    is_vision = models[model_id]["type"] == "vision"
+    if models[model_id].get("status") == "research":
+        raise SystemExit("Research-only model cannot be smoke-tested: " + model_id)
     cmd = [
-        sys.executable, str(Path(__file__).resolve().parents[1] / "run.py"),
+        sys.executable, str(root / "run.py"),
         model_id,
-        "Describe this image in one short sentence." if "vlm" in model_id
+        "Describe this image in one short sentence." if is_vision
         else "Reply in one short sentence: what is a CPU?",
         "--max-tokens", "48",
     ]
     with tempfile.TemporaryDirectory() as temp:
-        if "vlm" in model_id:
+        if is_vision:
             image = Path(temp) / "sample.png"
             create_test_image(image)
             cmd.extend(["--image", str(image)])
