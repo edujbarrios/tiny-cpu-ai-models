@@ -7,7 +7,7 @@ We welcome genuinely lightweight models that can run **locally on a CPU**.
 1. Model architecture and weights must have clear, open licenses. Do not add weights to the repository without permission.
 2. Provide a direct **HTTPS** download and a verified SHA-256 checksum. No mandatory accounts, tokens, or additional applications.
 3. Text models must use a GGUF format compatible with the public llama.cpp runtime.
-4. Users should be able to run models with the same command: `python run.py --model MODEL_ID "Your question"`.
+4. Users should be able to run models with the same command: `python run.py MODEL_ID "Your question"`.
 5. Test basic functionality, approximate RAM usage, and measured performance on an identified CPU. Do not invent benchmark results.
 6. Multimodal models require separate validation of the vision encoder, projector files, and inference runtime.
 
@@ -19,6 +19,7 @@ Add an entry to `models.json`, for example:
 {
   "my-model": {
     "name": "Human-readable model name",
+    "runtime": "llama.cpp",
     "type": "text",
     "parameters": "350M",
     "license": "Apache-2.0",
@@ -26,14 +27,17 @@ Add an entry to `models.json`, for example:
     "filename": "my-model-Q4_K_M.gguf",
     "url": "https://example.org/my-model-Q4_K_M.gguf",
     "sha256": "REPLACE_WITH_THE_REAL_64_CHARACTER_SHA256",
-    "size_mb": 250
+    "size_mb": 250,
+    "context_size": 2048
   }
 }
 ```
 
 Do not invent a checksum. Calculate it from the original model file and verify its source.
 
-Before opening a pull request, run `python -m unittest discover -s tests`, `python run.py --list`, and a real CPU inference.
+Add the entry alongside existing models. The launcher discovers it automatically from the JSON catalog. A unique ID is required; optional `aliases` can provide shorter names. For compatible vision GGUF models, specify `"type": "vision"` and provide an `mmproj` artifact object with its own `filename`, `url`, and verified `sha256`. Other runtime formats require implementing a new runtime adapter; do not describe them as supported until tested.
+
+Before opening a pull request, run `python -m unittest discover -s tests`, `python run.py --list`, and a real CPU inference with `python run.py MODEL_ID "Your question"`.
 
 ## Minimal-dependency philosophy
 
