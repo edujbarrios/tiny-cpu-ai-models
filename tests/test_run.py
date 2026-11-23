@@ -278,10 +278,11 @@ class RunnerTests(unittest.TestCase):
         self.assertTrue(image.is_file())
         self.assertEqual(image.read_bytes()[:8], b"\x89PNG\r\n\x1a\n")
 
-    def test_research_only_model_is_listed_but_not_executable(self):
+    def test_moondream_is_runnable_but_unsupported_0_5b_is_not_listed(self):
         models = run.load_catalog()
         self.assertNotIn("moondream-0.5b", models)
-        self.assertEqual(models["moondream-2b"]["status"], "research")
+        self.assertEqual(models["moondream-2b"]["type"], "vision")
+        self.assertNotEqual(models["moondream-2b"].get("status"), "research")
         output = io.StringIO()
         with patch("run.ensure_runtime", side_effect=AssertionError("runtime invoked")), \
              patch("sys.stdout", output), \
@@ -289,16 +290,30 @@ class RunnerTests(unittest.TestCase):
             self.assertEqual(run.main(), 0)
         listing = output.getvalue()
         self.assertNotIn("moondream-0.5b", listing)
-        self.assertIn("research only", listing)
-        self.assertIn("moondream-2b", listing)
-        self.assertNotIn("Run: python run.py moondream-2b", listing)
+        self.assertIn("Run: python run.py moondream-2b", listing)
+        self.assertIn("--image benchmark_image/example.png", listing)
 
-        for model_id in ("moondream-0.5b", "moondream-2b"):
-            with patch("run.ensure_runtime", side_effect=AssertionError("runtime invoked")), \
-                 patch.object(sys, "argv", ["run.py", model_id, "Test"]):
-                with self.assertRaises(SystemExit) as error:
-                    run.main()
-                self.assertEqual(error.exception.code, 2)
+    def test_moondream_uses_legacy_template_for_image_inference(self):
+        models = run.load_catalog()
+        model = models["moondream-2b"]
+        self.assertTrue(model["disable_jinja"])
+        with tempfile.TemporaryDirectory() as temp:
+            photo = Path(temp) / "photo.png"
+            photo.write_bytes(b"image")
+            with patch("run.ensure_runtime", return_value=Path("/tmp/llama-cli")), \
+                 patch("run.ensure_model", return_value=Path("/tmp/moondream.gguf")), \
+                 patch("run.ensure_artifact", return_value=Path("/tmp/mmproj.gguf")), \
+                 patch("run.subprocess.call", return_value=0) as call, \
+                 patch.object(sys, "argv", [
+                     "run.py", "moondream-2b", "Describe this image", "--image", str(photo)
+                 ]):
+                self.assertEqual(run.main(), 0)
+            command = call.call_args.args[0]
+            self.assertIn("--no-jinja", command)
+            self.assertIn("--mmproj", command)
+            self.assertIn("--image", command)
+            self.assertEqual(command[command.index("--gpu-layers") + 1], "0")
+            self.assertNotIn("--chat-template", command)
 
     def test_moondream_2b_has_matching_gguf_and_projector(self):
         model = run.load_catalog()["moondream-2b"]
