@@ -108,11 +108,12 @@ Both vision models download their weights and visual projectors automatically. F
 
 #### Tested CPU performance — vision
 
-| Model | Benchmark image | Reference identity | Actual model response | CPU | Prompt processing | Generation speed | Response time |
-| --- | --- | --- | --- | --- | ---: | ---: | ---: |
-| `smolvlm2-256m` | [example.png](benchmark_image/example.png) | Blue lemon shaped/textured like a golf ball, on a rock in a meadow | “The object is a blue-colored ball with a smooth texture, likely made from a natural material like concrete or plastic. It's placed on a rock, possibly in a grassy field or a rocky slope, with the sky visible in the background. The colors are vibrant and have a serene, natural aesthetic.” | Intel Core i7-1165G7 (Tiger Lake, 4 cores / 8 threads) | 48.6 tok/s | 65.4 tok/s | 20.15 s |
+| Model | Benchmark image | Reference identity | Actual model response | Correct identification | CPU | Prompt processing | Generation speed | Response time |
+| --- | --- | --- | --- | :---: | --- | ---: | ---: | ---: |
+| `smolvlm2-256m` | [example.png](benchmark_image/example.png) | Blue lemon shaped/textured like a golf ball, on a rock in a meadow | “The object is a blue-colored ball with a smooth texture, likely made from a natural material like concrete or plastic. It's placed on a rock, possibly in a grassy field or a rocky slope, with the sky visible in the background. The colors are vibrant and have a serene, natural aesthetic.” | ❌ | Intel Core i7-1165G7 (Tiger Lake, 4 cores / 8 threads) | 48.6 tok/s | 65.4 tok/s | 20.15 s |
+| `moondream-2b` | [example.png](benchmark_image/example.png) | Blue lemon shaped/textured like a golf ball, on a rock in a meadow | “The main object is a blue lemon sitting on a rock in a grassy field. The lemon is round in shape and has a vibrant blue color, making it a visually striking and unique scene in the image. The setting appears to be a grassy field or pasture, providing a natural backdrop that complements the bright blue hue of the lemon.” | ✅ | Intel Core i7-1165G7 (Tiger Lake, 4 cores / 8 threads) | 40.6 tok/s | 7.4 tok/s | 34.41 s |
 
-The model recognized the blue object, rock and grassy background, but classified the blue lemon as a **ball** rather than a lemon. The output above is from the provided Intel Core i7-1165G7 CPU test.
+Correct identification is based on whether the model identifies the main object as a **blue lemon**, rather than only its golf-ball-like appearance. Both rows are measurements reported on the Intel Core i7-1165G7; response time includes model loading, prompt processing, and generation.
 
 **Download provenance:** Granite and Qwen use publisher-hosted GGUF repositories. SmolLM2 variants use quantizations published by QuantFactory and LM Studio Community; SmolVLM2 GGUF and projector come from ggml-org, while the Moondream2 2025 F16 GGUF and matching projector come from ggml-org. All downloads use HTTPS with SHA-256 verification, and no Hugging Face software installation is required. The `granite` alias still resolves to `granite-350m`.
 
