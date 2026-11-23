@@ -93,16 +93,5 @@
     },
     "status": "research",
     "notes": "Verified official GGUF + projector available, but pinned llama.cpp b12651 fails image inference with 'number of media markers in text (0) does not match number of bitmaps (1)'. Not yet runnable through run.py."
-  },
-  "moondream-0.5b": {
-    "name": "Moondream 0.5B (edge / fine-tuning research)",
-    "type": "vision",
-    "status": "research",
-    "parameters": "500M",
-    "license": "Apache-2.0",
-    "source": "Moondream official 0.5B release; ONNX distribution via whistleroosh/moondream-0.5B",
-    "model_page": "https://moondream.ai/models",
-    "files_page": "https://huggingface.co/whistleroosh/moondream-0.5B/tree/main",
-    "notes": "No verified llama.cpp-compatible GGUF and projector pair available for the pinned runner; NOT executable via run.py yet."
   }
 }
