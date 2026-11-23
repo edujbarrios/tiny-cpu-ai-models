@@ -11,7 +11,6 @@ import unittest
 import zipfile
 from contextlib import redirect_stderr
 from pathlib import Path
-from types import SimpleNamespace
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -267,12 +266,11 @@ class RunnerTests(unittest.TestCase):
         listing = output.getvalue()
         for model_id in (
             "granite-350m", "smollm2-135m", "smollm2-360m",
-            "pythia-160m", "smolvlm2-256m", "qwen2.5-0.5b"
+            "smolvlm2-256m", "qwen2.5-0.5b"
         ):
             self.assertIn("python run.py {}".format(model_id), listing)
         self.assertIn("smolvlm2-256m", listing)
         self.assertIn("--image benchmark_image/example.png", listing)
-        self.assertIn('python run.py pythia-160m "Artificial intelligence is"', listing)
         self.assertIn("Text models:", listing)
         self.assertIn("Vision models:", listing)
 
@@ -325,34 +323,6 @@ class RunnerTests(unittest.TestCase):
         self.assertNotIn("moondream-0.5b", listing)
         self.assertIn("Run: python run.py moondream-2b", listing)
         self.assertIn("--image benchmark_image/example.png", listing)
-
-    def test_pythia_base_uses_raw_completion_not_chat_template(self):
-        model = run.load_catalog()["pythia-160m"]
-        self.assertEqual(model["inference_mode"], "completion")
-        self.assertEqual(model["example_prompt"], "Artificial intelligence is")
-        with tempfile.TemporaryDirectory() as temp:
-            base = Path(temp)
-            cli = base / "llama-cli"
-            raw = base / "llama-completion"
-            cli.touch()
-            raw.touch()
-            engine = run.select_inference_engine(cli, model)
-            self.assertEqual(engine, raw)
-            args = SimpleNamespace(
-                ctx_size=None, max_tokens=48, threads=None, image=None
-            )
-            command = run.build_command(
-                engine, model, base / "pythia.gguf",
-                "Artificial intelligence is", args
-            )
-            self.assertEqual(command[0], str(raw))
-            self.assertIn("--no-conversation", command)
-            self.assertNotIn("--show-timings", command)
-            self.assertNotIn("--chat-template", command)
-            self.assertEqual(command[command.index("--gpu-layers") + 1], "0")
-            self.assertEqual(
-                command[command.index("--prompt") + 1], "Artificial intelligence is"
-            )
 
     def test_moondream_uses_legacy_template_for_image_inference(self):
         models = run.load_catalog()
