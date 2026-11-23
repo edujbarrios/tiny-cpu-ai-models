@@ -104,16 +104,44 @@ python run.py smolvlm2-256m "Describe the main object, its color, shape, and set
 python run.py moondream-2b "Describe the main object, its color, shape, and setting." --image benchmark_image/example.png
 ```
 
-Both vision models download their weights and visual projectors automatically. For a fair comparison, use the same benchmark image and exact prompt. The Moondream2 CI image smoke test passed on Linux CPU, but no Intel i7-1165G7 benchmark has been reported yet.
+Both vision models download their weights and visual projectors automatically. For a fair comparison, use the same benchmark image and exact prompt. Both models have been benchmarked on the Intel Core i7-1165G7 using this image.
 
 #### Tested CPU performance — vision
 
-| Model | Benchmark image | Reference identity | Actual model response | Correct identification | CPU | Prompt processing | Generation speed | Response time |
-| --- | --- | --- | --- | :---: | --- | ---: | ---: | ---: |
-| `smolvlm2-256m` | [example.png](benchmark_image/example.png) | Blue lemon shaped/textured like a golf ball, on a rock in a meadow | “The object is a blue-colored ball with a smooth texture, likely made from a natural material like concrete or plastic. It's placed on a rock, possibly in a grassy field or a rocky slope, with the sky visible in the background. The colors are vibrant and have a serene, natural aesthetic.” | ❌ | Intel Core i7-1165G7 (Tiger Lake, 4 cores / 8 threads) | 48.6 tok/s | 65.4 tok/s | 20.15 s |
-| `moondream-2b` | [example.png](benchmark_image/example.png) | Blue lemon shaped/textured like a golf ball, on a rock in a meadow | “The main object is a blue lemon sitting on a rock in a grassy field. The lemon is round in shape and has a vibrant blue color, making it a visually striking and unique scene in the image. The setting appears to be a grassy field or pasture, providing a natural backdrop that complements the bright blue hue of the lemon.” | ✅ | Intel Core i7-1165G7 (Tiger Lake, 4 cores / 8 threads) | 40.6 tok/s | 7.4 tok/s | 34.41 s |
+The vision benchmark results are shown as XML so the full responses remain readable on narrow screens. ✅ means the object was correctly identified as a blue lemon; ❌ means it was not. CPU timings include model loading, prompt processing, and generation.
 
-Correct identification is based on whether the model identifies the main object as a **blue lemon**, rather than only its golf-ball-like appearance. Both rows are measurements reported on the Intel Core i7-1165G7; response time includes model loading, prompt processing, and generation.
+The same data is available as [machine-readable XML](benchmark_image/results.xml).
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<vision_benchmark image="benchmark_image/example.png"
+                  cpu="Intel Core i7-1165G7 (Tiger Lake, 4 cores / 8 threads)">
+  <ground_truth>Blue lemon with golf-ball-like texture on a rock in a grassy meadow</ground_truth>
+  <prompt>Describe the main object, its color, shape, and setting.</prompt>
+  <criterion>Correct if the main object is identified as a blue lemon</criterion>
+  <model id="smolvlm2-256m" quantization="Q4_K_M">
+    <correct_identification>❌</correct_identification>
+    <response><![CDATA[
+      The object is a blue-colored ball with a smooth texture, likely made
+      from a natural material like concrete or plastic. It's placed on a rock,
+      possibly in a grassy field or a rocky slope, with the sky visible in the
+      background. The colors are vibrant and have a serene, natural aesthetic.
+    ]]></response>
+    <performance prompt_tps="48.6" generation_tps="65.4" response_time_s="20.15" />
+  </model>
+  <model id="moondream-2b" quantization="F16">
+    <correct_identification>✅</correct_identification>
+    <response><![CDATA[
+      The main object is a blue lemon sitting on a rock in a grassy field. The
+      lemon is round in shape and has a vibrant blue color, making it a
+      visually striking and unique scene in the image. The setting appears to
+      be a grassy field or pasture, providing a natural backdrop that
+      complements the bright blue hue of the lemon.
+    ]]></response>
+    <performance prompt_tps="40.6" generation_tps="7.4" response_time_s="34.41" />
+  </model>
+</vision_benchmark>
+```
 
 **Download provenance:** Granite and Qwen use publisher-hosted GGUF repositories. SmolLM2 variants use quantizations published by QuantFactory and LM Studio Community; SmolVLM2 GGUF and projector come from ggml-org, while the Moondream2 2025 F16 GGUF and matching projector come from ggml-org. All downloads use HTTPS with SHA-256 verification, and no Hugging Face software installation is required. The `granite` alias still resolves to `granite-350m`.
 
