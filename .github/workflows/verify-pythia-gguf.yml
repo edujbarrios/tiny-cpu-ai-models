@@ -1,0 +1,39 @@
+name: Verify Pythia GGUF metadata
+on:
+  push:
+    paths:
+      - .github/workflows/verify-pythia-gguf.yml
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check Pythia Q4_K_M GGUF upstream LFS SHA-256
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import urllib.request
+          repo = "tensorblock/pythia-160m-GGUF"
+          filename = "pythia-160m-Q4_K_M.gguf"
+          url = f"https://huggingface.co/api/models/{repo}/tree/main"
+          req = urllib.request.Request(url, headers={"User-Agent":"tiny-cpu-ai-models/0.1"})
+          with urllib.request.urlopen(req,timeout=45) as response:
+              data=json.load(response)
+          items=[it for it in data if it.get("path")==filename]
+          if len(items)!=1:
+              raise SystemExit("GGUF not found in upstream directory: "+str([x.get("path") for x in data]))
+          item=items[0]
+          sha=item.get("lfs",{}).get("oid")
+          if not isinstance(sha,str) or len(sha)!=64:
+              raise SystemExit("Missing official LFS SHA256: "+str(item))
+          print(f"VERIFIED_GGUF_FILENAME={filename}")
+          print(f"VERIFIED_GGUF_SHA256={sha}")
+          print(f"VERIFIED_GGUF_SIZE_BYTES={item.get('size')}")
+          print(f"VERIFIED_GGUF_URL=https://huggingface.co/{repo}/resolve/main/{filename}")
+          PY
