@@ -72,5 +72,24 @@
     "sha256": "74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db",
     "size_mb": 491,
     "context_size": 2048
+  },
+  "moondream-2b": {
+    "name": "Moondream2 2B (2024-05-08, Q5_K)",
+    "type": "vision",
+    "runtime": "llama.cpp",
+    "parameters": "~2B",
+    "license": "Apache-2.0",
+    "source": "cjpais/moondream2-llamafile (GGUF conversion, 2024-05-08 release)",
+    "filename": "moondream2-050824-q5k.gguf",
+    "url": "https://huggingface.co/cjpais/moondream2-llamafile/resolve/main/moondream2-050824-q5k.gguf",
+    "sha256": "17fd38418d407fca71b9eed817ae1ba9d602c891c67426a401d44149bd3db4a3",
+    "size_mb": 1060,
+    "context_size": 2048,
+    "mmproj": {
+      "filename": "moondream2-mmproj-050824-f16.gguf",
+      "url": "https://huggingface.co/cjpais/moondream2-llamafile/resolve/main/moondream2-mmproj-050824-f16.gguf",
+      "sha256": "151e39246d5c80f215b4e7c73b913703055694239a3de4422005f78353e4e901",
+      "size_mb": 910
+    }
   }
 }
