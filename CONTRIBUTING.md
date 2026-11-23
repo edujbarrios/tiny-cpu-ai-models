@@ -1,44 +1,46 @@
-# Contribuir
+# Contributing
 
-Buscamos modelos realmente ligeros que puedan usarse **localmente y en CPU**.
+We welcome genuinely lightweight models that can run **locally on a CPU**.
 
-## Criterios de entrada
+## Requirements for new models
 
-1. Modelo y pesos con licencia abierta y clara; no añadir pesos al repositorio sin permiso.
-2. Descarga directa **HTTPS** y SHA-256 comprobado; sin logins, tokens ni aplicaciones obligatorias.
-3. Formato GGUF compatible con la versión pública de llama.cpp (para texto).
-4. Instrucciones que funcionen con el mismo comando `python run.py --model IDENTIFICADOR "Pregunta"`.
-5. Comprobar funcionamiento, RAM aproximada y velocidad real en una CPU identificada. No inventar métricas.
-6. Para modelos multimodales hay que validar procesador visual, archivos auxiliares y ejecución; requieren una integración específica.
+1. Model architecture and weights must have clear, open licenses. Do not add weights to the repository without permission.
+2. Provide a direct **HTTPS** download and a verified SHA-256 checksum. No mandatory accounts, tokens, or additional applications.
+3. Text models must use a GGUF format compatible with the public llama.cpp runtime.
+4. Users should be able to run models with the same command: `python run.py --model MODEL_ID "Your question"`.
+5. Test basic functionality, approximate RAM usage, and measured performance on an identified CPU. Do not invent benchmark results.
+6. Multimodal models require separate validation of the vision encoder, projector files, and inference runtime.
 
-## Añadir un modelo de texto
+## Adding a text model
 
-Edita `models.json` con una entrada como:
+Add an entry to `models.json`, for example:
 
 ```json
 {
-  "mi-modelo": {
-    "name": "Nombre legible",
+  "my-model": {
+    "name": "Human-readable model name",
     "type": "text",
     "parameters": "350M",
     "license": "Apache-2.0",
-    "source": "Nombre del editor",
-    "filename": "mi-modelo-Q4_K_M.gguf",
-    "url": "https://ejemplo.org/mi-modelo-Q4_K_M.gguf",
-    "sha256": "SHA256_DE_64_CARACTERES",
+    "source": "Original publisher",
+    "filename": "my-model-Q4_K_M.gguf",
+    "url": "https://example.org/my-model-Q4_K_M.gguf",
+    "sha256": "REPLACE_WITH_THE_REAL_64_CHARACTER_SHA256",
     "size_mb": 250
   }
 }
 ```
 
-No sustituyas `sha256` por un hash inventado: obtenlo del archivo original y verifica el origen.
+Do not invent a checksum. Calculate it from the original model file and verify its source.
 
-Prueba localmente `python -m unittest discover -s tests`, `python run.py --list` y una inferencia antes de proponer el cambio.
+Before opening a pull request, run `python -m unittest discover -s tests`, `python run.py --list`, and a real CPU inference.
 
-## Filosofía de dependencias
+## Minimal-dependency philosophy
 
-- Biblioteca estándar de Python para el lanzador.
-- Sin `pip install`, Hugging Face CLI, Ollama, Torch o Docker.
-- El motor nativo se descarga directamente de un origen abierto y verificable.
-- Pesos y motor se descargan solo en el primer uso; inferencia offline.
-- Explicar claramente los servidores desde los que se descargan los archivos.
+- Use the Python standard library for the launcher.
+- No mandatory `pip install`, Hugging Face CLI, Ollama, Torch, or Docker.
+- Download the native runtime directly from an open, verifiable source.
+- Download weights and runtime on first use; support offline inference afterward.
+- Clearly disclose where files are hosted and what is downloaded.
+
+Thanks for helping make tiny, open-source AI easy to run.
