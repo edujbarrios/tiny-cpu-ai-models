@@ -300,9 +300,7 @@ def example_command(model_id, spec):
             'python run.py {} "Describe the main object, its color, '
             'shape, and setting." --image benchmark_image/example.png'
         ).format(model_id)
-    return 'python run.py {} "{}"'.format(
-        model_id, spec.get("example_prompt", "Tell me something interesting.")
-    )
+    return 'python run.py {} "Tell me something interesting."'.format(model_id)
 
 
 def list_models(models):
@@ -331,18 +329,6 @@ def list_models(models):
 
 
 
-def select_inference_engine(engine, model):
-    """Use the bundled raw completion executable for pretrained base models."""
-    if model.get("inference_mode", "chat") != "completion":
-        return engine
-    executable = "llama-completion.exe" if engine.suffix.lower() == ".exe" else "llama-completion"
-    candidates = [p for p in engine.parent.rglob(executable) if p.is_file()]
-    if not candidates:
-        raise RuntimeError(
-            "The pinned CPU runtime has no llama-completion binary for this platform."
-        )
-    return candidates[0]
-
 
 def build_command(engine, model, weights, prompt, args, projector=None):
     """Build an inference command from catalog metadata, not model-specific code."""
@@ -354,9 +340,8 @@ def build_command(engine, model, weights, prompt, args, projector=None):
         "--gpu-layers", "0",
         "--ctx-size", str(args.ctx_size or model.get("context_size", 2048)),
         "--predict", str(args.max_tokens),
+        "--show-timings",
     ])
-    if model.get("inference_mode", "chat") != "completion":
-        command.append("--show-timings")
     if args.threads is not None:
         command.extend(["--threads", str(args.threads)])
     if model.get("chat_template"):
@@ -371,15 +356,11 @@ def build_command(engine, model, weights, prompt, args, projector=None):
             "--no-mmproj-offload",
             "--image", str(Path(args.image).expanduser().resolve()),
         ])
-    if model.get("inference_mode", "chat") == "completion":
-        command.append("--no-conversation")
     if prompt:
         command.extend([
             "--prompt", prompt,
             "--single-turn", "--no-display-prompt",
         ])
-    elif model.get("inference_mode", "chat") == "completion":
-        command.append("--interactive")
     return command
 
 
@@ -471,7 +452,7 @@ def main():
         if not image_file.is_file():
             parser.error("Image file not found: " + str(image_file))
 
-    engine = select_inference_engine(ensure_runtime(offline=args.offline), model)
+    engine = ensure_runtime(offline=args.offline)
     weights = ensure_model(model, offline=args.offline)
 
     projector = None
