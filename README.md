@@ -12,25 +12,16 @@ python run.py MODEL_ID "Your prompt"
 
 ## Quick start
 
-**Linux / macOS**
-
 ```bash
 git clone https://github.com/edujbarrios/tiny-cpu-ai-models.git
 cd tiny-cpu-ai-models
-python3 run.py granite-350m "Tell me something interesting."
+python run.py granite-350m "Tell me something interesting."
 ```
 
-**Windows (PowerShell)**
+That's it. On first use, the script automatically downloads the model and CPU runtime. No `pip install`, Ollama, or Hugging Face installation required.
 
-```powershell
-git clone https://github.com/edujbarrios/tiny-cpu-ai-models.git
-cd tiny-cpu-ai-models
-py -3 run.py granite-350m "Tell me something interesting."
-```
+**Python command:** If `python` is not available, use `python3` (common on Linux/macOS) or `py -3` (Windows).
 
-On first use, the script downloads the model and the prebuilt CPU runtime. On later runs, it reuses the local cache. No `pip install` is needed.
-
-Don't have Git? Select **Code → Download ZIP**, extract the files, open a terminal in the folder, and run the final command shown above.
 
 ## Command-line interface
 
@@ -39,17 +30,17 @@ python run.py MODEL_ID "Your prompt" [OPTIONS]
 ```
 
 ```bash
-python3 run.py --list
-python3 run.py granite-350m "Explain how neural networks work."
-python3 run.py granite-350m
-python3 run.py granite-350m "Hello" --max-tokens 128
-python3 run.py granite-350m "Hello" --threads 4
-python3 run.py granite-350m "Hello" --ctx-size 2048
-python3 run.py granite-350m "Hello" --offline
-python3 run.py --help
+python run.py --list
+python run.py granite-350m "Explain how neural networks work."
+python run.py granite-350m
+python run.py granite-350m "Hello" --max-tokens 128
+python run.py granite-350m "Hello" --threads 4
+python run.py granite-350m "Hello" --ctx-size 2048
+python run.py granite-350m "Hello" --offline
+python run.py --help
 ```
 
-Omit the prompt for interactive chat. `--offline` disables downloads after the model and runtime have been cached. Replace `python3` with `py -3` on Windows.
+Omit the prompt for interactive chat. `--offline` disables downloads after the model and runtime have been cached.
 
 **One consistent interface for every registered model.** You choose a model using its catalog ID; the launcher does not hard-code Granite.
 
@@ -68,7 +59,7 @@ Additional small language models and VLMs will be added as their CPU inference p
 **No changes to `run.py` are required for new llama.cpp-compatible GGUF models.** Add a record to [`models.json`](models.json), using a unique model ID, a direct HTTPS download URL, and its verified SHA-256 checksum. Then use:
 
 ```bash
-python3 run.py my-model "Tell me something."
+python run.py my-model "Tell me something."
 ```
 
 For example, this is a *template*, not an installed model:
@@ -119,7 +110,7 @@ The launcher has a manifest-based path for **vision models that are compatible w
 Once **actual compatible files and checksums** are provided, a registered VLM can use:
 
 ```bash
-python3 run.py example-vlm "Describe this picture." --image photo.jpg
+python run.py example-vlm "Describe this picture." --image photo.jpg
 ```
 
 Vision support is a **generic integration point, not a claim that a specific VLM has been tested**. Some models require different runtimes or additional preprocessing, which will need separate adapters. The current version targets llama.cpp-compatible GGUF language models and supported VLM architectures; it is **not** a universal runtime for arbitrary model formats.
