@@ -86,6 +86,16 @@ python run.py qwen2.5-0.5b "Tell me something interesting."
 | Model ID | Model | Parameters | Quantization | Download size | License |
 | --- | --- | ---: | --- | --- | --- |
 | `smolvlm2-256m` | [SmolVLM2 256M Video Instruct](https://huggingface.co/HuggingFaceTB/SmolVLM2-256M-Video-Instruct) | 256M | Q4_K_M | 131 MB model + 104 MB projector | Apache-2.0 |
+| `moondream-2b` | [Moondream2 (~2B; 2024-05-08)](https://huggingface.co/cjpais/moondream2-llamafile) | ~2B | Q5_K | 1.06 GB model + 910 MB projector | Apache-2.0 |
+
+
+**Research candidate — not yet runnable:**
+
+| Model ID | Model | Parameters | Format available | Status |
+| --- | --- | ---: | --- | --- |
+| `moondream-0.5b` | [Moondream 0.5B](https://moondream.ai/models) | 500M | [ONNX](https://huggingface.co/whistleroosh/moondream-0.5B/tree/main) | Research only: no verified llama.cpp-compatible GGUF + visual projector for this launcher |
+
+Moondream 0.5B is interesting for edge deployment and task-specific fine-tuning, but it **cannot yet be launched via `python run.py moondream-0.5b`**. It appears in `--models` clearly marked as research-only. Do not attempt a fake GGUF download or install extra frameworks silently.
 
 #### Visual recognition benchmark
 
@@ -97,9 +107,10 @@ python run.py qwen2.5-0.5b "Tell me something interesting."
 
 ```bash
 python run.py smolvlm2-256m "Describe the main object, its color, shape, and setting." --image benchmark_image/example.png
+python run.py moondream-2b "Describe the main object, its color, shape, and setting." --image benchmark_image/example.png
 ```
 
-The vision model and its visual projector are downloaded automatically. For a fair comparison, use this image and the exact prompt above.
+The vision model and its visual projector are downloaded automatically. Moondream2 is significantly larger and may require several gigabytes of RAM; its 2024 Q5_K variant is provided as an experimental CPU option. For a fair comparison, use this image and the exact prompt above.
 
 #### Tested CPU performance — vision
 
@@ -109,7 +120,7 @@ The vision model and its visual projector are downloaded automatically. For a fa
 
 The model recognized the blue object, rock and grassy background, but classified the blue lemon as a **ball** rather than a lemon. The output above is from the provided Intel Core i7-1165G7 CPU test.
 
-**Download provenance:** Granite and Qwen use publisher-hosted GGUF repositories. SmolLM2 variants use quantizations published by QuantFactory and LM Studio Community; SmolVLM2 GGUF and projector come from ggml-org. All downloads use HTTPS with SHA-256 verification, and no Hugging Face software installation is required. The `granite` alias still resolves to `granite-350m`.
+**Download provenance:** Granite and Qwen use publisher-hosted GGUF repositories. SmolLM2 variants use quantizations published by QuantFactory and LM Studio Community; SmolVLM2 GGUF and projector come from ggml-org, while the Moondream2 2024 Q5_K GGUF and matching projector come from cjpais. All downloads use HTTPS with SHA-256 verification, and no Hugging Face software installation is required. The `granite` alias still resolves to `granite-350m`.
 
 ## Adding another model
 
