@@ -106,6 +106,7 @@
     "size_mb": 110,
     "context_size": 2048,
     "example_prompt": "Artificial intelligence is",
-    "smoke_prompt": "The CPU is"
+    "smoke_prompt": "The CPU is",
+    "inference_mode": "completion"
   }
 }
