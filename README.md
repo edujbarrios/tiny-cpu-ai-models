@@ -62,6 +62,7 @@ The catalog separates **text** and **vision** models and prints a ready-to-copy 
 | `smollm2-135m` | [SmolLM2 135M Instruct](https://huggingface.co/HuggingFaceTB/SmolLM2-135M-Instruct) | 135M | Q4_K_M | 105 MB | Apache-2.0 |
 | `smollm2-360m` | [SmolLM2 360M Instruct](https://huggingface.co/HuggingFaceTB/SmolLM2-360M-Instruct) | 360M | Q4_K_M | 271 MB | Apache-2.0 |
 | `qwen2.5-0.5b` | [Qwen2.5 0.5B Instruct](https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct) | 500M | Q4_K_M | 491 MB | Apache-2.0 |
+| `pythia-160m` | [EleutherAI Pythia 160M (base)](https://huggingface.co/EleutherAI/pythia-160m) | 160M | Q4_K_M | 110 MB | Apache-2.0 |
 
 #### Tested CPU performance — text
 
@@ -72,6 +73,8 @@ The catalog separates **text** and **vision** models and prints a ready-to-copy 
 | `smollm2-360m` | Intel Core i7-1165G7 (Tiger Lake, 4 cores / 8 threads, up to 4.7 GHz) | Q4_K_M | 232.8 tok/s | 38.4 tok/s | 1.50 s |
 | `qwen2.5-0.5b` | Intel Core i7-1165G7 (Tiger Lake, 4 cores / 8 threads, up to 4.7 GHz) | Q4_K_M | 180.4 tok/s | 30.9 tok/s | 3.62 s |
 
+Pythia-160M is a **base language model**, not an instruction-following chatbot. Its example is a text completion, and its original [full-precision weights](https://huggingface.co/EleutherAI/pythia-160m) are suitable for separate fine-tuning experiments. GGUF weights are used here for local CPU inference.
+
 #### Run a text model
 
 ```bash
@@ -79,6 +82,7 @@ python run.py granite-350m "Tell me something interesting."
 python run.py smollm2-135m "Tell me something interesting."
 python run.py smollm2-360m "Tell me something interesting."
 python run.py qwen2.5-0.5b "Tell me something interesting."
+python run.py pythia-160m "Artificial intelligence is"
 ```
 
 ### Vision models
