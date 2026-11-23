@@ -92,5 +92,25 @@
       "size_mb": 910
     },
     "disable_jinja": true
+  },
+  "lfm2-vl-450m": {
+    "name": "LiquidAI LFM2-VL 450M (Q4_0)",
+    "type": "vision",
+    "runtime": "llama.cpp",
+    "parameters": "450M",
+    "license": "LFM Open License v1.0",
+    "license_url": "https://www.liquid.ai/lfm-license",
+    "source": "LiquidAI/LFM2-VL-450M-GGUF (official publisher GGUF)",
+    "filename": "LFM2-VL-450M-Q4_0.gguf",
+    "url": "https://huggingface.co/LiquidAI/LFM2-VL-450M-GGUF/resolve/main/LFM2-VL-450M-Q4_0.gguf",
+    "sha256": "1fbf4797e8669cdeabd97fa1d31ab046907cb1fc78b1c3d4bda1ba879574e5d7",
+    "size_mb": 219,
+    "context_size": 4096,
+    "mmproj": {
+      "filename": "mmproj-LFM2-VL-450M-Q8_0.gguf",
+      "url": "https://huggingface.co/LiquidAI/LFM2-VL-450M-GGUF/resolve/main/mmproj-LFM2-VL-450M-Q8_0.gguf",
+      "sha256": "a6a813fae4ba3f90852a990fdd4786a017dba0e80e599a366853ba539ee2b5ef",
+      "size_mb": 104
+    }
   }
 }
