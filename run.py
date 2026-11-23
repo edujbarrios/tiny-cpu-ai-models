@@ -52,7 +52,7 @@ def download(url, dest, expected_sha256):
     if not expected_sha256 or len(expected_sha256) != 64:
         raise RuntimeError("A valid SHA-256 checksum is required to verify downloads.")
 
-    if dest.is_file() and file_sha256(dest) == expected_sha256:
+    if dest.is_file() and file_sha256(dest).lower() == expected_sha256.lower():
         info("✓ Already downloaded: " + dest.name)
         return
 
@@ -102,7 +102,7 @@ def platform_archive_suffix():
 
 
 def select_asset(releases, suffix):
-    """Solo paquetes CPU oficiales de llama.cpp; no CUDA, ROCm ni Vulkan."""
+    """Select official llama.cpp CPU-only archives, never GPU-specific packages."""
     for release in releases:
         for asset in release.get("assets", []):
             name = asset.get("name", "")
@@ -218,18 +218,32 @@ def ensure_runtime(offline=False):
     return binary
 
 
-def ensure_model(model, offline=False):
-    filename = model["filename"]
-    if Path(filename).name != filename or not filename.endswith(".gguf"):
+def ensure_artifact(artifact, offline=False):
+    """Fetch a verified GGUF file; shared by text models and vision projectors."""
+    filename = artifact["filename"]
+    if (
+        not isinstance(filename, str)
+        or Path(filename).name != filename
+        or not filename.lower().endswith(".gguf")
+    ):
         raise RuntimeError("Invalid GGUF filename in models.json.")
+    checksum = artifact["sha256"]
+    if not isinstance(checksum, str) or len(checksum) != 64:
+        raise RuntimeError("Invalid SHA-256 in models.json.")
+
     path = CACHE / "models" / filename
-    if path.is_file() and file_sha256(path).lower() == model["sha256"].lower():
-        info("✓ Cached model: " + filename)
+    if path.is_file() and file_sha256(path).lower() == checksum.lower():
+        info("✓ Cached file: " + filename)
         return path
     if offline:
-        raise RuntimeError("No verified model found in the cache. Run once without --offline.")
-    download(model["url"], path, model["sha256"])
+        raise RuntimeError("No verified file in the cache. Run once without --offline.")
+    download(artifact["url"], path, checksum)
     return path
+
+
+def ensure_model(model, offline=False):
+    """Backwards-compatible helper for the main model weights."""
+    return ensure_artifact(model, offline=offline)
 
 
 def load_catalog():
@@ -237,55 +251,149 @@ def load_catalog():
         models = json.load(source)
     if not isinstance(models, dict):
         raise RuntimeError("models.json must contain a JSON object of models.")
+    for model_id, spec in models.items():
+        if not isinstance(model_id, str) or not isinstance(spec, dict):
+            raise RuntimeError("Invalid entry in models.json.")
+        if spec.get("type") not in ("text", "vision"):
+            raise RuntimeError("Unsupported model type for " + model_id)
+        if spec.get("runtime", "llama.cpp") != "llama.cpp":
+            raise RuntimeError(
+                "Unsupported runtime for " + model_id
+                + ". The current launcher supports llama.cpp-compatible GGUF files."
+            )
+        aliases = spec.get("aliases", [])
+        if (
+            not isinstance(aliases, list)
+            or any(not isinstance(alias, str) or not alias for alias in aliases)
+        ):
+            raise RuntimeError("Invalid aliases for " + model_id)
+        if spec.get("type") == "vision" and "mmproj" not in spec:
+            raise RuntimeError("Vision model " + model_id + " requires an mmproj artifact.")
     return models
 
 
-def main():
-    parser = argparse.ArgumentParser(
-        description="Tiny open models running on CPU. No Ollama or Hugging Face libraries."
+def resolve_model(models, model_id):
+    """Resolve a canonical model ID or a declared alias."""
+    if model_id in models:
+        return model_id, models[model_id]
+    matches = [
+        (name, spec) for name, spec in models.items()
+        if model_id in spec.get("aliases", [])
+    ]
+    if len(matches) == 1:
+        return matches[0]
+    if len(matches) > 1:
+        raise RuntimeError("Ambiguous model alias: " + model_id)
+    raise RuntimeError(
+        "Unknown model: {}. Use --list to see available models.".format(model_id)
     )
-    parser.add_argument("prompt", nargs="*", help="Question (leave blank for interactive chat)")
-    parser.add_argument("--model", default="granite", help="Model ID from models.json")
-    parser.add_argument("--list", action="store_true", help="List available models")
-    parser.add_argument("--offline", action="store_true", help="Do not download anything")
-    parser.add_argument("--max-tokens", type=int, default=192, help="Maximum response tokens")
-    parser.add_argument("--threads", type=int, default=None, help="CPU threads")
-    args = parser.parse_args()
 
-    if args.max_tokens <= 0 or (args.threads is not None and args.threads <= 0):
-        parser.error("--max-tokens and --threads must be positive.")
-    models = load_catalog()
-    if args.list:
-        for key, model in models.items():
-            print("{}: {} ({}, {})".format(
-                key, model["name"], model["parameters"], model["license"]
-            ))
-        return 0
-    if args.model not in models:
-        parser.error("Unknown model: {}. Use --list.".format(args.model))
 
-    model = models[args.model]
-    engine = ensure_runtime(offline=args.offline)
-    weights = ensure_model(model, offline=args.offline)
+def list_models(models):
+    print("Available models:")
+    for model_id, spec in models.items():
+        aliases = spec.get("aliases", [])
+        alias_text = " (aliases: {})".format(", ".join(aliases)) if aliases else ""
+        print("  {}{} - {} | {} | {}".format(
+            model_id, alias_text, spec["name"],
+            spec["parameters"], spec["type"]
+        ))
 
+
+def build_command(engine, model, weights, prompt, args, projector=None):
+    """Build an inference command from catalog metadata, not model-specific code."""
     command = [str(engine)]
     if engine.stem == "llama":
         command.append("cli")  # Unified CLI in newer llama.cpp versions
     command.extend([
         "--model", str(weights),
         "--gpu-layers", "0",
-        "--ctx-size", "2048",
+        "--ctx-size", str(args.ctx_size or model.get("context_size", 2048)),
         "--predict", str(args.max_tokens),
         "--no-show-timings",
     ])
-    if args.threads:
+    if args.threads is not None:
         command.extend(["--threads", str(args.threads)])
-    if args.prompt:
-        command.extend(["--prompt", " ".join(args.prompt), "--single-turn", "--no-display-prompt"])
-    else:
-        info("Local chat is ready. Press Ctrl+C or type /exit to quit.")
+    if args.image:
+        if projector is None:
+            raise RuntimeError("A vision model with a projector is required for --image.")
+        command.extend([
+            "--mmproj", str(projector),
+            "--no-mmproj-offload",
+            "--image", str(Path(args.image).expanduser().resolve()),
+        ])
+    if prompt:
+        command.extend([
+            "--prompt", prompt,
+            "--single-turn", "--no-display-prompt",
+        ])
+    return command
 
-    info("▶ Running {} (CPU-only)".format(model["name"]))
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Run tiny open-source AI models on CPU. No Ollama or HF CLI.",
+        epilog='Example: python run.py granite-350m "Tell me something"',
+    )
+    parser.add_argument("model", nargs="?", metavar="MODEL_ID", help="Model ID from models.json")
+    parser.add_argument("prompt", nargs="*", metavar="PROMPT", help="Text prompt (omit for interactive chat)")
+    parser.add_argument("--list", action="store_true", help="List all registered models")
+    parser.add_argument("--offline", action="store_true", help="Never download any files")
+    parser.add_argument("--image", metavar="PATH", help="Image path (vision models only)")
+    parser.add_argument("--max-tokens", type=int, default=192, help="Maximum output tokens")
+    parser.add_argument("--ctx-size", type=int, default=None, help="Context size in tokens")
+    parser.add_argument("--threads", type=int, default=None, help="Number of CPU threads")
+    parser.add_argument("--model", dest="legacy_model", default=None, help=argparse.SUPPRESS)
+    args = parser.parse_args()
+
+    if (
+        args.max_tokens <= 0
+        or (args.ctx_size is not None and args.ctx_size <= 0)
+        or (args.threads is not None and args.threads <= 0)
+    ):
+        parser.error("--max-tokens, --ctx-size, and --threads must be positive.")
+
+    models = load_catalog()
+    if args.list:
+        list_models(models)
+        return 0
+
+    # Keep older commands such as: python run.py --model granite "Hello".
+    if args.legacy_model:
+        if args.model:
+            args.prompt.insert(0, args.model)
+        args.model = args.legacy_model
+
+    if not args.model:
+        parser.print_help()
+        print()
+        list_models(models)
+        return 0
+
+    try:
+        model_id, model = resolve_model(models, args.model)
+    except RuntimeError as error:
+        parser.error(str(error))
+
+    if args.image:
+        if model["type"] != "vision":
+            parser.error("Model '{}' is text-only and cannot accept --image.".format(model_id))
+        image_file = Path(args.image).expanduser()
+        if not image_file.is_file():
+            parser.error("Image file not found: " + str(image_file))
+
+    engine = ensure_runtime(offline=args.offline)
+    weights = ensure_model(model, offline=args.offline)
+
+    projector = None
+    if args.image and model["type"] == "vision":
+        projector = ensure_artifact(model["mmproj"], offline=args.offline)
+
+    prompt = " ".join(args.prompt)
+    command = build_command(engine, model, weights, prompt, args, projector=projector)
+    if not prompt:
+        info("Local chat is ready. Press Ctrl+C or type /exit to quit.")
+    info("▶ Running {} ({}, CPU-only)".format(model["name"], model_id))
     return subprocess.call(command, cwd=str(engine.parent))
 
 
