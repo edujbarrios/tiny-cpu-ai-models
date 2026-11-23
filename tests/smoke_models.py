@@ -39,10 +39,8 @@ def main(model_id):
     cmd = [
         sys.executable, str(root / "run.py"),
         model_id,
-        models[model_id].get("smoke_prompt", (
-            "Describe this image in one short sentence." if is_vision
-            else "Reply in one short sentence: what is a CPU?"
-        )),
+        "Describe this image in one short sentence." if is_vision
+        else "Reply in one short sentence: what is a CPU?",
         "--max-tokens", "48",
     ]
     with tempfile.TemporaryDirectory() as temp:
@@ -58,17 +56,9 @@ def main(model_id):
         print(result.stdout, flush=True)
         if result.returncode:
             return result.returncode
-        if models[model_id].get("inference_mode") == "completion":
-            rates = re.findall(
-                r"eval time\s*=\s*[0-9.]+\s*ms\s*/\s*[0-9]+\s*runs\s*"
-                r"\([^)]*?,\s*([0-9.]+)\s*tokens per second",
-                result.stdout,
-            )
-        else:
-            rates = re.findall(
-                r"Generation:\s*([0-9]+(?:\.[0-9]+)?)\s*t/s",
-                result.stdout,
-            )
+        rates = re.findall(
+            r"Generation:\s*([0-9]+(?:\.[0-9]+)?)\s*t/s", result.stdout,
+        )
         if not rates or float(rates[-1]) <= 0:
             print("ERROR: Model produced no measurable output tokens.", file=sys.stderr)
             return 1
