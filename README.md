@@ -86,15 +86,10 @@ python run.py qwen2.5-0.5b "Tell me something interesting."
 | Model ID | Model | Parameters | Quantization | Download size | License |
 | --- | --- | ---: | --- | --- | --- |
 | `smolvlm2-256m` | [SmolVLM2 256M Video Instruct](https://huggingface.co/HuggingFaceTB/SmolVLM2-256M-Video-Instruct) | 256M | Q4_K_M | 131 MB model + 104 MB projector | Apache-2.0 |
+| `moondream-2b` | [Moondream2 (2025-04-14)](https://huggingface.co/ggml-org/moondream2-20250414-GGUF) | ~2B | F16 | 2.84 GB model + 910 MB projector | Apache-2.0 |
 
 
-**Research candidate — not yet runnable:**
-
-| Model ID | Model | Parameters | Format available | Status |
-| --- | --- | ---: | --- | --- |
-| `moondream-2b` | [Moondream2 (2025-04-14)](https://huggingface.co/ggml-org/moondream2-20250414-GGUF) | ~2B | [F16 GGUF + projector](https://huggingface.co/ggml-org/moondream2-20250414-GGUF/tree/main), ~3.75 GB | Research only: pinned llama.cpp runtime fails actual image tokenization |
-
-Moondream2 has published GGUF files, but image inference with the pinned llama.cpp runtime fails with a media-marker tokenization error. It is listed as research-only in `--models`, without an executable command, until integration passes a real image-inference test.
+Moondream2 uses the GGUF's embedded Vicuna template with `--no-jinja` for correct CPU image inference. This setting is applied automatically by the runner. It requires considerably more RAM and storage than SmolVLM2.
 
 #### Visual recognition benchmark
 
@@ -106,9 +101,10 @@ Moondream2 has published GGUF files, but image inference with the pinned llama.c
 
 ```bash
 python run.py smolvlm2-256m "Describe the main object, its color, shape, and setting." --image benchmark_image/example.png
+python run.py moondream-2b "Describe the main object, its color, shape, and setting." --image benchmark_image/example.png
 ```
 
-The validated SmolVLM2 vision model and its projector are downloaded automatically. For a fair comparison, use the benchmark image and the exact prompt above.
+Both vision models download their weights and visual projectors automatically. For a fair comparison, use the same benchmark image and exact prompt. The Moondream2 CI image smoke test passed on Linux CPU, but no Intel i7-1165G7 benchmark has been reported yet.
 
 #### Tested CPU performance — vision
 
@@ -118,7 +114,7 @@ The validated SmolVLM2 vision model and its projector are downloaded automatical
 
 The model recognized the blue object, rock and grassy background, but classified the blue lemon as a **ball** rather than a lemon. The output above is from the provided Intel Core i7-1165G7 CPU test.
 
-**Download provenance:** Granite and Qwen use publisher-hosted GGUF repositories. SmolLM2 variants use quantizations published by QuantFactory and LM Studio Community; SmolVLM2 GGUF and projector come from ggml-org, while the experimental Moondream2 2025 F16 GGUF and matching projector come from ggml-org. All downloads use HTTPS with SHA-256 verification, and no Hugging Face software installation is required. The `granite` alias still resolves to `granite-350m`.
+**Download provenance:** Granite and Qwen use publisher-hosted GGUF repositories. SmolLM2 variants use quantizations published by QuantFactory and LM Studio Community; SmolVLM2 GGUF and projector come from ggml-org, while the Moondream2 2025 F16 GGUF and matching projector come from ggml-org. All downloads use HTTPS with SHA-256 verification, and no Hugging Face software installation is required. The `granite` alias still resolves to `granite-350m`.
 
 ## Adding another model
 
