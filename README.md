@@ -121,6 +121,7 @@ benchmark:
   correct_if: "Correct if the main object is identified as a blue lemon"
   models:
     smolvlm2-256m:
+      model_name: "SmolVLM2 256M Video Instruct"
       quantization: Q4_K_M
       correct_identification: false  # ❌
       response: >-
@@ -133,6 +134,7 @@ benchmark:
         generation_tps: 65.4
         response_time_s: 20.15
     moondream-2b:
+      model_name: "Moondream2 ~2B (2025-04-14)"
       quantization: F16
       correct_identification: true  # ✅
       response: >-
