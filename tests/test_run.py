@@ -269,7 +269,14 @@ class RunnerTests(unittest.TestCase):
         ):
             self.assertIn("python run.py {}".format(model_id), listing)
         self.assertIn("smolvlm2-256m", listing)
-        self.assertIn("--image photo.jpg", listing)
+        self.assertIn("--image benchmark_image/example.png", listing)
+        self.assertIn("Text models:", listing)
+        self.assertIn("Vision models:", listing)
+
+    def test_vision_benchmark_image_exists_and_is_png(self):
+        image = Path(__file__).resolve().parents[1] / "benchmark_image" / "example.png"
+        self.assertTrue(image.is_file())
+        self.assertEqual(image.read_bytes()[:8], b"\\x89PNG\\r\\n\\x1a\\n")
 
     def test_model_checksums_and_direct_urls(self):
         models = run.load_catalog()
