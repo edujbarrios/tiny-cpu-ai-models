@@ -73,6 +73,8 @@ To compare models scientifically, keep the same prompt, context window, quantiza
 
 `granite` is a backwards-compatible alias for `granite-350m`.
 
+Additional small language models and VLMs will be added as their CPU inference paths are verified. **Only Granite is registered at present.** It is a text-only model.
+
 ## Community CPU results
 
 These are **observed runs**, not standardized benchmarks or guaranteed performance. Different CPUs, prompts, output lengths, and settings can produce very different results.
@@ -82,9 +84,6 @@ These are **observed runs**, not standardized benchmarks or guaranteed performan
 | `granite-350m` | Q4_K_M | 281.1 tok/s | **42.4 tok/s** | **3.58 s** | Not reported | Community-reported run |
 
 **Measurement notes:** Response time excludes initial model/runtime downloads but includes process startup, model loading, prompt processing, and generation. The original run's CPU model, thread count, prompt, generated token count, and context settings were not provided; therefore this sample is for reference only and should not be used as a controlled comparison. Contributions with full hardware and methodology details are welcome.
-
-
-Additional small language models and VLMs will be added as their CPU inference paths are verified. **Only Granite is registered at present.** It is a text-only model.
 
 ## Adding another model
 
