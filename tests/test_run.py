@@ -281,6 +281,7 @@ class RunnerTests(unittest.TestCase):
     def test_research_only_model_is_listed_but_not_executable(self):
         models = run.load_catalog()
         self.assertEqual(models["moondream-0.5b"]["status"], "research")
+        self.assertEqual(models["moondream-2b"]["status"], "research")
         output = io.StringIO()
         with patch("run.ensure_runtime", side_effect=AssertionError("runtime invoked")), \
              patch("sys.stdout", output), \
@@ -290,12 +291,15 @@ class RunnerTests(unittest.TestCase):
         self.assertIn("moondream-0.5b", listing)
         self.assertIn("research only", listing)
         self.assertNotIn("Run: python run.py moondream-0.5b", listing)
+        self.assertIn("moondream-2b", listing)
+        self.assertNotIn("Run: python run.py moondream-2b", listing)
 
-        with patch("run.ensure_runtime", side_effect=AssertionError("runtime invoked")), \
-             patch.object(sys, "argv", ["run.py", "moondream-0.5b", "Test"]):
-            with self.assertRaises(SystemExit) as error:
-                run.main()
-            self.assertEqual(error.exception.code, 2)
+        for model_id in ("moondream-0.5b", "moondream-2b"):
+            with patch("run.ensure_runtime", side_effect=AssertionError("runtime invoked")), \
+                 patch.object(sys, "argv", ["run.py", model_id, "Test"]):
+                with self.assertRaises(SystemExit) as error:
+                    run.main()
+                self.assertEqual(error.exception.code, 2)
 
     def test_moondream_2b_has_matching_gguf_and_projector(self):
         model = run.load_catalog()["moondream-2b"]
