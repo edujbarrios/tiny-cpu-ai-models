@@ -344,6 +344,8 @@ def build_command(engine, model, weights, prompt, args, projector=None):
         command.extend(["--threads", str(args.threads)])
     if model.get("chat_template"):
         command.extend(["--chat-template", model["chat_template"]])
+    if model.get("disable_jinja", False):
+        command.append("--no-jinja")
     if args.image:
         if projector is None:
             raise RuntimeError("A vision model with a projector is required for --image.")
