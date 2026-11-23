@@ -1,14 +1,16 @@
 # Tiny CPU AI Models
 
-**Small, open-source AI models. Local inference. CPU-only. Minimal setup.**
+**Making local AI accessible on everyday CPUs — one simple command, no cloud required.**
 
-A growing, reproducible collection of lightweight models you can run with one consistent command:
+Most AI projects focus on larger models and cloud infrastructure. This project explores the opposite: **small, lightweight, open-source language and vision models** that can run **offline on low-resource devices using only a CPU**.
+
+The goal is twofold: **make AI easier for everyone to use**, with minimal setup and no technical AI stack to install; and build a **reproducible collection of compact models for experimentation, benchmarking, and task-specific fine-tuning**. Smaller models can be especially attractive for efficient adaptation to specialized tasks, although fine-tuning effectiveness still depends on the model, data, and task.
 
 ```bash
 python run.py MODEL_ID "Your prompt"
 ```
 
-> **Project philosophy:** no mandatory Hugging Face Python packages, Ollama, PyTorch, Transformers, Docker, model managers, accounts, or API keys. Just **Python 3.9+**, the model you choose, and your CPU. The launcher downloads the appropriate native runtime and model weights automatically on first use. All inference is local.
+**Requirements:** Python 3.9+; internet access only for the first download. No Ollama, Docker, PyTorch, Transformers, Hugging Face Python packages, accounts, or API keys. Models run locally on CPU and can be reused offline.
 
 ## Quick start
 
