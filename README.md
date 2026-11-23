@@ -30,7 +30,7 @@ python run.py MODEL_ID "Your prompt" [OPTIONS]
 ```
 
 ```bash
-python run.py --list
+python run.py --models
 python run.py granite-350m "Explain how neural networks work."
 python run.py granite-350m
 python run.py granite-350m "Hello" --max-tokens 128
@@ -42,7 +42,7 @@ python run.py --help
 
 Omit the prompt for interactive chat. `--offline` disables downloads after the model and runtime have been cached.
 
-**One consistent interface for every registered model.** You choose a model using its catalog ID; the launcher does not hard-code Granite.
+**One consistent interface for every registered model.** Use `python run.py --models` to list models and see a ready-to-copy test command for each one (`--list` is also supported). The launcher does not hard-code a particular model.
 
 ## CPU performance metrics
 
@@ -67,23 +67,35 @@ To compare models scientifically, keep the same prompt, context window, quantiza
 
 ## Available models
 
-| Model ID | Model | Task | Parameters | Quantization | Approximate download | Model license |
-| --- | --- | --- | --- | --- | --- | --- |
-| `granite-350m` | [IBM Granite 4.0 350M](https://huggingface.co/ibm-granite/granite-4.0-350m) | Text generation | 350M | GGUF Q4_K_M | 237 MB | Apache-2.0 |
+```bash
+python run.py --models
+```
 
-`granite` is a backwards-compatible alias for `granite-350m`.
+This prints every registered model with a **ready-to-copy test command**. The following models can be downloaded directly through the runner (no Hugging Face installation or Ollama required):
 
-Additional small language models and VLMs will be added as their CPU inference paths are verified. **Only Granite is registered at present.** It is a text-only model.
+| Model ID | Model | Parameters | Type | Quantization | Download size | License |
+| --- | --- | ---: | --- | --- | ---: | --- |
+| `granite-350m` | [IBM Granite 4.0 350M](https://huggingface.co/ibm-granite/granite-4.0-350m) | 350M | Text | Q4_K_M | 237 MB | Apache-2.0 |
+| `smollm2-135m` | [SmolLM2 135M Instruct](https://huggingface.co/HuggingFaceTB/SmolLM2-135M-Instruct) | 135M | Text | Q4_K_M | 105 MB | Apache-2.0 |
+| `smollm2-360m` | [SmolLM2 360M Instruct](https://huggingface.co/HuggingFaceTB/SmolLM2-360M-Instruct) | 360M | Text | Q4_K_M | 271 MB | Apache-2.0 |
+| `smolvlm2-256m` | [SmolVLM2 256M Video Instruct](https://huggingface.co/HuggingFaceTB/SmolVLM2-256M-Video-Instruct) | 256M | Vision | Q4_K_M | 131 MB model + 104 MB projector | Apache-2.0 |
+| `qwen2.5-0.5b` | [Qwen2.5 0.5B Instruct](https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct) | 500M | Text | Q4_K_M | 491 MB | Apache-2.0 |
 
-## Community CPU results
+### Run each model
 
-These are **observed runs**, not standardized benchmarks or guaranteed performance. Different CPUs, prompts, output lengths, and settings can produce very different results.
+```bash
+python run.py granite-350m "Tell me something interesting."
+python run.py smollm2-135m "Tell me something interesting."
+python run.py smollm2-360m "Tell me something interesting."
+python run.py qwen2.5-0.5b "Tell me something interesting."
+python run.py smolvlm2-256m "Describe this image." --image photo.jpg
+```
 
-| Model | Quantization | Prompt processing | Generation speed | Response time | CPU | Source |
-| --- | --- | ---: | ---: | ---: | --- | --- |
-| `granite-350m` | Q4_K_M | 281.1 tok/s | **42.4 tok/s** | **3.58 s** | Intel Core i7-1165G7 (Tiger Lake; 4 cores / 8 threads, up to 4.7 GHz) | Community-reported run |
+For the vision example, replace `photo.jpg` with the path to an image on your computer. The visual projector is downloaded automatically when needed. The SmolVLM2 variant was trained for video and images; this launcher currently exposes **single-image** inference, not a video-processing flag.
 
-**Measurement notes:** Response time excludes initial model/runtime downloads but includes process startup, model loading, prompt processing, and generation. The original run's CPU model is now documented, but the inference thread count, exact prompt, generated token count, and context settings were not provided; therefore this sample is for reference only and should not be used as a controlled comparison. Contributions with full hardware and methodology details are welcome.
+**Download provenance:** Granite and Qwen use their publishers' GGUF repositories. SmolLM2 GGUFs come from third-party quantizations published by QuantFactory and LM Studio Community. SmolVLM2 GGUF and projector come from ggml-org. The `models.json` manifest includes direct HTTPS links and published SHA-256 checksums for all files. GGUF hosting does **not** mean Hugging Face software is installed.
+
+The entry `granite` remains an alias for `granite-350m`. Registration confirms that the source files and their checksums are available; it does not imply that every combination of CPU/OS and model has been benchmarked.
 
 ## Adding another model
 
@@ -116,7 +128,7 @@ Insert this as another entry alongside `granite-350m`, not as a replacement for 
 
 ### Vision models (VLMs)
 
-The launcher has a manifest-based path for **vision models that are compatible with llama.cpp**, including their separate visual projector. Register `"type": "vision"` and an `"mmproj"` object containing its own `filename`, `url` and `sha256`:
+The launcher supports **vision models compatible with llama.cpp**, including a separate visual projector. SmolVLM2 is the first registered VLM. Register `"type": "vision"` and an `"mmproj"` object containing its own `filename`, `url` and `sha256`:
 
 ```json
 {
@@ -144,7 +156,7 @@ Once **actual compatible files and checksums** are provided, a registered VLM ca
 python run.py example-vlm "Describe this picture." --image photo.jpg
 ```
 
-Vision support is a **generic integration point, not a claim that a specific VLM has been tested**. Some models require different runtimes or additional preprocessing, which will need separate adapters. The current version targets llama.cpp-compatible GGUF language models and supported VLM architectures; it is **not** a universal runtime for arbitrary model formats.
+Vision support is an integration point; performance and compatibility should be validated per model and CPU platform. Some models require different runtimes or additional preprocessing, which will need separate adapters. The current version targets llama.cpp-compatible GGUF language models and supported VLM architectures; it is **not** a universal runtime for arbitrary model formats.
 
 More details and contribution guidelines: [CONTRIBUTING.md](CONTRIBUTING.md).
 
@@ -171,7 +183,7 @@ Linux binaries provided upstream may require compatible system libraries. CPU in
 
 ```bash
 python -m unittest discover -s tests -v
-python run.py --list
+python run.py --models
 python run.py granite-350m "Hello" --max-tokens 24
 python run.py granite-350m "Hello again" --offline --max-tokens 24
 ```
