@@ -91,7 +91,6 @@
       "sha256": "4cc1cb3660d87ff56432ebeb7884ad35d67c48c7b9f6b2856f305e39c38eed8f",
       "size_mb": 910
     },
-    "status": "research",
-    "notes": "Verified official GGUF + projector available, but pinned llama.cpp b12651 fails image inference with 'number of media markers in text (0) does not match number of bitmaps (1)'. Not yet runnable through run.py."
+    "disable_jinja": true
   }
 }
