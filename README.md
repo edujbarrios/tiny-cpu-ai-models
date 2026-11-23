@@ -1,87 +1,89 @@
 # Tiny CPU AI Models
 
-**Modelos de IA diminutos, abiertos y locales. Solo CPU. Sin complicaciones.**
+**Tiny, open-source AI models. Local. CPU-only. No complicated setup.**
 
-La idea es que cualquier persona pueda probar modelos ligeros con unos pocos comandos, incluso sin GPU.
+Run lightweight AI models on your own computer with just a few commands, even without a GPU.
 
-> **Filosofía:** no obligar a instalar **Hugging Face, Ollama, PyTorch, Transformers, Docker** ni gestores de modelos. El usuario necesita únicamente **Python 3.9+** y conexión a Internet para la primera descarga. No se requiere cuenta, token ni clave API. La inferencia se ejecuta en su ordenador, sin enviar prompts a servidores.
+> **Our philosophy:** users should not have to install **Hugging Face libraries, Ollama, PyTorch, Transformers, Docker, or a model manager**. All you need is **Python 3.9+** and an internet connection for the initial download. No accounts, API keys, or access tokens are required. Inference runs locally; your prompts are not sent to an inference server.
 
-## ⚡ Empieza en 3 comandos
+## ⚡ Get started in 3 commands
 
-Linux / macOS (terminal):
+**Linux / macOS (Terminal)**
 
 ```bash
 git clone https://github.com/edujbarrios/tiny-cpu-ai-models.git
 cd tiny-cpu-ai-models
-python3 run.py "Explica qué es una CPU en una frase"
+python3 run.py "Explain what a CPU is in one sentence"
 ```
 
-Windows (PowerShell):
+**Windows (PowerShell)**
 
 ```powershell
 git clone https://github.com/edujbarrios/tiny-cpu-ai-models.git
 cd tiny-cpu-ai-models
-py -3 run.py "Explica qué es una CPU en una frase"
+py -3 run.py "Explain what a CPU is in one sentence"
 ```
 
-**Eso es todo.** El primer arranque descarga automáticamente el modelo y un binario de `llama.cpp` para CPU. Los siguientes reutilizan lo descargado.
+**That's it.** On the first run, the script automatically downloads a small AI model and a prebuilt CPU-only `llama.cpp` executable. Later runs reuse the cached files.
 
-Si no tienes Git, también puedes usar **Code → Download ZIP**, descomprimirlo y ejecutar `python run.py` desde la carpeta.
+Don't have Git? Use **Code → Download ZIP**, extract the project, and run `python run.py` in that directory.
 
-## 💬 Uso
+## 💬 Usage
 
 ```bash
-python3 run.py                         # chat interactivo con Granite
-python3 run.py "¿Qué es GGUF?"        # pregunta y termina
-python3 run.py --list                 # modelos disponibles
-python3 run.py --model granite "Hola" # selección explícita
-python3 run.py --offline "Hola"       # sin conexión (tras primera descarga)
-python3 run.py --max-tokens 256 "Hola"
-python3 run.py --threads 4 "Hola"
+python3 run.py                            # Interactive chat with Granite
+python3 run.py "What is GGUF?"           # Ask one question and exit
+python3 run.py --list                    # List available models
+python3 run.py --model granite "Hello"   # Choose a specific model
+python3 run.py --offline "Hello"         # No downloads after first setup
+python3 run.py --max-tokens 256 "Hello"  # Limit response length
+python3 run.py --threads 4 "Hello"       # Use 4 CPU threads
 ```
 
-En Windows puedes sustituir `python3` por `py -3`.
+On Windows, replace `python3` with `py -3`.
 
-## Modelos
+## Available models
 
-| Identificador | Modelo | Tipo | Parámetros | Cuantización | Descarga | Licencia |
+| ID | Model | Type | Parameters | Quantization | Download size | License |
 | --- | --- | --- | --- | --- | --- | --- |
-| `granite` | [IBM Granite 4.0 350M](https://huggingface.co/ibm-granite/granite-4.0-350m) | Texto | 350M | GGUF Q4_K_M | ~237 MB | Apache-2.0 |
+| `granite` | [IBM Granite 4.0 350M](https://huggingface.co/ibm-granite/granite-4.0-350m) | Text | 350M | GGUF Q4_K_M | ~237 MB | Apache-2.0 |
 
-**Primero Granite.** Más adelante iremos incorporando otros modelos pequeños (incluidos VLM como SmolVLM cuando se valide una instalación igual de sencilla). No se presenta Granite como un modelo de visión: **solo procesa texto**.
+**We start with Granite.** More small models will follow, including vision-language models (VLMs) such as SmolVLM once an equally straightforward setup has been verified. Granite is a **text-only** model; it cannot interpret images.
 
-## ¿De dónde sale lo que descarga?
+## Where do the downloads come from?
 
-La transparencia forma parte del proyecto:
+Transparency matters:
 
-- **Motor de inferencia:** [llama.cpp](https://github.com/ggml-org/llama.cpp) (MIT). Se descarga su **binario CPU precompilado** de [GitHub Releases](https://github.com/ggml-org/llama.cpp/releases); no tienes que compilar nada en las plataformas compatibles.
-- **Pesos del modelo:** descarga HTTPS directa del [repositorio GGUF oficial de IBM](https://huggingface.co/ibm-granite/granite-4.0-350m-GGUF), alojado actualmente en Hugging Face. **No hace falta instalar Hugging Face, usar su CLI ni registrarse**, pero **la descarga inicial sí depende de ese alojamiento**. No ocultamos esa diferencia.
-- Los archivos se guardan en `.cache/` dentro de este proyecto, se verifica su SHA-256 y después puedes ejecutarlos **sin Internet** con `--offline`. Para usar otra fuente de descarga de pesos, se puede configurar la URL en `models.json` manteniendo la comprobación SHA-256.
+- **Inference engine:** [llama.cpp](https://github.com/ggml-org/llama.cpp), licensed under MIT. The script downloads an official **prebuilt CPU executable** from [GitHub Releases](https://github.com/ggml-org/llama.cpp/releases). No compilation is needed on supported platforms.
+- **Model weights:** downloaded over HTTPS from [IBM's official GGUF repository](https://huggingface.co/ibm-granite/granite-4.0-350m-GGUF), currently hosted on Hugging Face. **You do not need to install Hugging Face, run its CLI, or create an account.** The initial model download **does** rely on Hugging Face hosting; we make that distinction clear.
+- **Local cache:** downloads are saved in this project's `.cache/` directory and verified with SHA-256. After setup, use `--offline` to prevent any further downloads. To use a different host for model files, update the direct download URL in `models.json` and retain SHA-256 verification.
 
-No instalamos librerías Python adicionales y no utilizamos servicios de inferencia externos.
+No extra Python packages are installed, and no remote inference service is used.
 
-## Compatibilidad
+## Requirements and compatibility
 
-**Primera versión:** Windows x64/ARM64, macOS Intel/Apple Silicon y Linux x64/ARM64 **si existen los binarios adecuados en GitHub Releases**. En Linux, los binarios oficiales de Ubuntu pueden requerir bibliotecas de sistema compatibles y no funcionan necesariamente en todas las distribuciones. Para arquitecturas que no tengan binarios precompilados, el script mostrará un error claro; no descarga instaladores extra ni compila silenciosamente.
+**Initial support:** Windows x64/ARM64, macOS Intel/Apple Silicon, and Linux x64/ARM64, **where suitable prebuilt binaries are published in GitHub Releases**. Official Ubuntu builds may depend on compatible system libraries, so not every Linux distribution will work out of the box. Unsupported architectures produce a clear error rather than installing additional tools or compiling in the background.
 
-- **Python:** 3.9 o posterior.
-- **GPU:** no necesaria ni utilizada (`--gpu-layers 0`).
-- **RAM:** depende del sistema, del contexto y del modelo; el GGUF pesa ~237 MB, pero la RAM real será mayor.
-- **Espacio:** al menos 500 MB libres para el modelo y el motor, con margen adicional para descomprimir.
-- **Sin conexión:** después de haber descargado modelo y motor, `--offline` bloquea las descargas.
+- **Python:** version 3.9 or newer.
+- **GPU:** not required or used (`--gpu-layers 0`).
+- **RAM:** depends on the model, operating system, and context length. The GGUF file is about 237 MB; actual RAM usage is higher.
+- **Storage:** allow at least 500 MB for downloads and extracted files, plus temporary extraction space.
+- **Offline usage:** available after the model and runtime have been downloaded successfully.
 
-La velocidad depende de cada CPU. No se prometen tokens/segundo sin medirlos.
+Inference speed depends on your CPU. We do not claim specific tokens-per-second figures without reproducible benchmarks.
 
-## ¿Cómo añadir otro modelo?
+## Adding more models
 
-La lista está en [`models.json`](models.json). Cada modelo GGUF de **texto** necesita nombre, URL de descarga directa, nombre de archivo y SHA-256. El mismo `run.py` lo podrá lanzar con `--model ID`. Para VLM harán falta, además, pruebas de compatibilidad con el proyector visual: **no basta con añadir el nombre de un GGUF**.
+Models are listed in [`models.json`](models.json). Each new **text GGUF** model needs a name, direct download URL, filename, and SHA-256 hash. You can then run it using `python3 run.py --model MODEL_ID`.
 
-Consulta [CONTRIBUTING.md](CONTRIBUTING.md) si quieres colaborar.
+VLMs require additional integration and testing for visual encoders and projector files; **adding a GGUF filename alone is not enough**.
 
-## Licencias
+See [CONTRIBUTING.md](CONTRIBUTING.md) to contribute.
 
-El código propio de este repositorio se distribuye bajo [MIT](LICENSE). El modelo IBM Granite se distribuye bajo **Apache-2.0** y el motor llama.cpp bajo **MIT**; se descargan desde sus respectivos autores, no se incluyen en el código fuente de este repositorio.
+## Licenses
+
+Original code in this repository is licensed under [MIT](LICENSE). IBM Granite model weights are licensed under **Apache-2.0**, and llama.cpp is licensed under **MIT**. They are downloaded from their respective publishers and are not included in this source repository.
 
 ---
 
-**Objetivo:** `clonar → ejecutar → probar`. Que lo difícil sea experimentar con la IA, no instalarla.
+**Goal:** `clone → run → experiment`. Getting started with tiny local AI should be easier than setting up an AI stack.
