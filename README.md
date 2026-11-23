@@ -44,27 +44,6 @@ Omit the prompt for interactive chat. `--offline` disables downloads after the m
 
 **One consistent interface for every registered model.** Use `python run.py --models` to list models and see a ready-to-copy test command for each one (`--list` is also supported). The launcher does not hard-code a particular model.
 
-## CPU performance metrics
-
-Every run prints **tokens per second** directly from llama.cpp:
-
-```text
-[ Prompt: ... t/s | Generation: ... t/s ]
-```
-
-For a one-shot prompt, the launcher additionally reports:
-
-```text
-[CPU] Response time: ... s (includes model loading, prompt processing, and generation).
-```
-
-- **Generation (tokens/s):** llama.cpp's measured token decoding throughput. This is the metric to compare model generation speed.
-- **Prompt (tokens/s):** prompt-processing throughput, reported separately.
-- **Response time (seconds):** wall-clock time from launching the inference process until it finishes, **excluding downloads but including model loading and prompt processing**. It is *not* decode-only time.
-- **Interactive chat:** llama.cpp prints token speed for each answer; the launcher displays the total chat-session duration when you exit.
-
-To compare models scientifically, keep the same prompt, context window, quantization, number of CPU threads, and machine. Repeat warmed-up runs because loading and disk caching influence total elapsed time.
-
 ## Available models
 
 ```bash
@@ -81,6 +60,11 @@ This prints every registered model with a **ready-to-copy test command**. The fo
 | `smolvlm2-256m` | [SmolVLM2 256M Video Instruct](https://huggingface.co/HuggingFaceTB/SmolVLM2-256M-Video-Instruct) | 256M | Vision | Q4_K_M | 131 MB model + 104 MB projector | Apache-2.0 |
 | `qwen2.5-0.5b` | [Qwen2.5 0.5B Instruct](https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct) | 500M | Text | Q4_K_M | 491 MB | Apache-2.0 |
 
+### Tested CPU performance
+
+| Model | CPU | Quantization | Prompt processing | Generation speed | Response time |
+| --- | --- | --- | ---: | ---: | ---: |
+| `granite-350m` | Intel Core i7-1165G7 (Tiger Lake, 4 cores / 8 threads, up to 4.7 GHz) | Q4_K_M | 281.1 tok/s | 42.4 tok/s | 3.58 s |
 ### Run each model
 
 ```bash
