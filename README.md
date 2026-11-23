@@ -2,7 +2,7 @@
 
 **Making local AI accessible on everyday CPUs — one simple command, no cloud required.**
 
-Most AI projects focus on larger models and cloud infrastructure. This project explores the opposite: **small, lightweight, open-source language and vision models** that can run **offline on low-resource devices using only a CPU**.
+Most AI projects focus on larger models and cloud infrastructure. This project explores the opposite: **small, lightweight, openly available language and vision models** that can run **offline on low-resource devices using only a CPU**.
 
 The goal is twofold: **make AI easier for everyone to use**, with minimal setup and no technical AI stack to install; and build a **reproducible collection of compact models for experimentation, benchmarking, and task-specific fine-tuning**. Smaller models can be especially attractive for efficient adaptation to specialized tasks, although fine-tuning effectiveness still depends on the model, data, and task.
 
@@ -88,9 +88,12 @@ python run.py qwen2.5-0.5b "Tell me something interesting."
 | --- | --- | ---: | --- | --- | --- |
 | `smolvlm2-256m` | [SmolVLM2 256M Video Instruct](https://huggingface.co/HuggingFaceTB/SmolVLM2-256M-Video-Instruct) | 256M | Q4_K_M | 131 MB model + 104 MB projector | Apache-2.0 |
 | `moondream-2b` | [Moondream2 (2025-04-14)](https://huggingface.co/ggml-org/moondream2-20250414-GGUF) | ~2B | F16 | 2.84 GB model + 910 MB projector | Apache-2.0 |
+| `lfm2-vl-450m` | [LiquidAI LFM2-VL 450M](https://huggingface.co/LiquidAI/LFM2-VL-450M-GGUF) | 450M | Q4_0 | 219 MB model + 104 MB projector | [LFM Open License v1.0](https://www.liquid.ai/lfm-license) |
 
 
 Moondream2 uses the GGUF's embedded Vicuna template with `--no-jinja` for correct CPU image inference. This setting is applied automatically by the runner. It requires considerably more RAM and storage than SmolVLM2.
+
+**LFM2-VL license:** LFM Open License v1.0 permits research, modification and fine-tuning, but is **not Apache-2.0 or MIT**. Free commercial use is limited by a **$10 million annual company revenue threshold**; check the [publisher's full license](https://www.liquid.ai/lfm-license) before commercial use. This repository links to upstream weights and does not redistribute them.
 
 #### Visual recognition benchmark
 
@@ -103,9 +106,10 @@ Moondream2 uses the GGUF's embedded Vicuna template with `--no-jinja` for correc
 ```bash
 python run.py smolvlm2-256m "Describe the main object, its color, shape, and setting." --image benchmark_image/example.png
 python run.py moondream-2b "Describe the main object, its color, shape, and setting." --image benchmark_image/example.png
+python run.py lfm2-vl-450m "Describe the main object, its color, shape, and setting." --image benchmark_image/example.png
 ```
 
-Both vision models download their weights and visual projectors automatically. For a fair comparison, use the same benchmark image and exact prompt. Both models have been benchmarked on the Intel Core i7-1165G7 using this image.
+All vision models download their weights and visual projectors automatically. For a fair comparison, use the same benchmark image and exact prompt. Only SmolVLM2 and Moondream2 have reported measurements on the Intel Core i7-1165G7; LFM2-VL awaits a benchmark on that CPU.
 
 #### Tested CPU performance — vision
 
@@ -150,7 +154,7 @@ benchmark:
         response_time_s: 34.41
 ```
 
-**Download provenance:** Granite and Qwen use publisher-hosted GGUF repositories. SmolLM2 variants use quantizations published by QuantFactory and LM Studio Community; SmolVLM2 GGUF and projector come from ggml-org, while the Moondream2 2025 F16 GGUF and matching projector come from ggml-org. All downloads use HTTPS with SHA-256 verification, and no Hugging Face software installation is required. The `granite` alias still resolves to `granite-350m`.
+**Download provenance:** Granite and Qwen use publisher-hosted GGUF repositories. SmolLM2 variants use quantizations published by QuantFactory and LM Studio Community; SmolVLM2 GGUF and projector come from ggml-org, while the Moondream2 2025 F16 GGUF and matching projector come from ggml-org. LFM2-VL GGUF and projector are published by LiquidAI. All downloads use HTTPS with SHA-256 verification, and no Hugging Face software installation is required. The `granite` alias still resolves to `granite-350m`.
 
 ## Adding another model
 
@@ -247,7 +251,7 @@ GitHub Actions checks Python unit tests on Windows, macOS and Linux, and perform
 
 ## Licenses
 
-Original code in this repository is licensed under [MIT](LICENSE). IBM Granite weights are licensed under **Apache-2.0**; llama.cpp is licensed under **MIT**. We download the respective artifacts from their upstream publishers and do not bundle them in this repository.
+Original code in this repository is licensed under [MIT](LICENSE), and llama.cpp is MIT-licensed. Granite, SmolLM2, SmolVLM2, Qwen2.5, and Moondream2 weights use **Apache-2.0**. LiquidAI LFM2-VL uses the **[LFM Open License v1.0](https://www.liquid.ai/lfm-license)**, with a commercial-use revenue condition. Model weights are downloaded from their respective publishers and are not bundled in this repository.
 
 ---
 
