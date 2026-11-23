@@ -92,5 +92,20 @@
       "size_mb": 910
     },
     "disable_jinja": true
+  },
+  "pythia-160m": {
+    "name": "EleutherAI Pythia 160M Base (Q4_K_M)",
+    "type": "text",
+    "runtime": "llama.cpp",
+    "parameters": "160M",
+    "license": "Apache-2.0",
+    "source": "QuantFactory/pythia-160m-GGUF (based on EleutherAI/pythia-160m)",
+    "filename": "pythia-160m.Q4_K_M.gguf",
+    "url": "https://huggingface.co/QuantFactory/pythia-160m-GGUF/resolve/main/pythia-160m.Q4_K_M.gguf",
+    "sha256": "5f55bef2787f1e4b0ce46d441f42e6f302dc92a60d9ef20b0e3972942545b2fe",
+    "size_mb": 110,
+    "context_size": 2048,
+    "example_prompt": "Artificial intelligence is",
+    "smoke_prompt": "The CPU is"
   }
 }
