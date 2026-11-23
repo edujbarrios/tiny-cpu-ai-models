@@ -272,6 +272,8 @@ class RunnerTests(unittest.TestCase):
         self.assertIn("smolvlm2-256m", listing)
         self.assertIn("--image benchmark_image/example.png", listing)
         self.assertIn("Text models:", listing)
+        self.assertNotIn("pythia-160m", listing)
+        self.assertIn("python run.py lfm2-vl-450m", listing)
         self.assertIn("Vision models:", listing)
 
     def test_vision_benchmark_yaml_contains_actual_cpu_results(self):
@@ -345,6 +347,20 @@ class RunnerTests(unittest.TestCase):
             self.assertIn("--image", command)
             self.assertEqual(command[command.index("--gpu-layers") + 1], "0")
             self.assertNotIn("--chat-template", command)
+
+    def test_lfm2_vl_official_cpu_vision_files_and_license(self):
+        catalog = run.load_catalog()
+        self.assertNotIn("pythia-160m", catalog)
+        model = catalog["lfm2-vl-450m"]
+        self.assertEqual(model["type"], "vision")
+        self.assertEqual(model["runtime"], "llama.cpp")
+        self.assertEqual(model["license"], "LFM Open License v1.0")
+        self.assertTrue(model["license_url"].startswith("https://www.liquid.ai/"))
+        self.assertTrue(model["url"].startswith("https://huggingface.co/LiquidAI/"))
+        self.assertEqual(len(model["sha256"]), 64)
+        self.assertEqual(len(model["mmproj"]["sha256"]), 64)
+        self.assertIn("Q4_0", model["filename"])
+        self.assertIn("Q8_0", model["mmproj"]["filename"])
 
     def test_moondream_2b_has_matching_gguf_and_projector(self):
         model = run.load_catalog()["moondream-2b"]
