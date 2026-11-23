@@ -8,6 +8,7 @@ import tarfile
 import tempfile
 import unittest
 import zipfile
+from contextlib import redirect_stderr
 from pathlib import Path
 from unittest.mock import patch
 
@@ -113,6 +114,8 @@ class RunnerTests(unittest.TestCase):
         command = call.call_args.args[0]
         self.assertIn("--gpu-layers", command)
         self.assertEqual(command[command.index("--gpu-layers") + 1], "0")
+        self.assertIn("--show-timings", command)
+        self.assertNotIn("--no-show-timings", command)
         self.assertIn("--single-turn", command)
         self.assertEqual(command[command.index("--prompt") + 1], "Hello")
 
@@ -125,6 +128,39 @@ class RunnerTests(unittest.TestCase):
         self.assertEqual(
             run.resolve_model(models, "granite")[0], "granite-350m"
         )
+
+
+    def test_cpu_response_time_summary(self):
+        output = io.StringIO()
+        with patch("run.time.perf_counter", side_effect=[100.0, 103.25]), \
+             patch("run.subprocess.call", return_value=0) as execute, \
+             redirect_stderr(output):
+            result = run.run_inference(["llama-cli"], Path("."), interactive=False)
+        self.assertEqual(result, 0)
+        execute.assert_called_once()
+        self.assertIn("Response time: 3.25 s", output.getvalue())
+        self.assertIn("model loading, prompt processing, and generation", output.getvalue())
+        self.assertIn("tokens/s", output.getvalue())
+
+    def test_interactive_reports_session_not_response_duration(self):
+        output = io.StringIO()
+        with patch("run.time.perf_counter", side_effect=[200.0, 202.4]), \
+             patch("run.subprocess.call", return_value=0), \
+             redirect_stderr(output):
+            result = run.run_inference(["llama-cli"], Path("."), interactive=True)
+        self.assertEqual(result, 0)
+        self.assertIn("Chat session: 2.40 s", output.getvalue())
+        self.assertIn("Per-response generation throughput", output.getvalue())
+        self.assertNotIn("Response time:", output.getvalue())
+
+    def test_failed_inference_does_not_report_success_metrics(self):
+        output = io.StringIO()
+        with patch("run.time.perf_counter", side_effect=[1.0, 2.0]), \
+             patch("run.subprocess.call", return_value=1), \
+             redirect_stderr(output):
+            result = run.run_inference(["llama-cli"], Path("."), interactive=False)
+        self.assertEqual(result, 1)
+        self.assertNotIn("Response time:", output.getvalue())
 
     def test_unknown_model_is_rejected(self):
         with self.assertRaisesRegex(RuntimeError, "Unknown model"):
