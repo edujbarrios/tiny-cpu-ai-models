@@ -38,16 +38,23 @@ class RunnerTests(unittest.TestCase):
                  patch("run.platform.machine", return_value=machine):
                 self.assertEqual(run.platform_archive_suffix(), expected)
 
-    def test_asset_selection_rejects_cuda(self):
-        asset = {
-            "name": "llama-b42-bin-ubuntu-x64.tar.gz",
-            "digest": "sha256:" + "a" * 64,
-            "browser_download_url": "https://github.com/example/llama.tar.gz",
-        }
-        cuda = dict(asset, name="cudart-llama-b42-bin-ubuntu-x64.tar.gz")
-        url, sha = run.select_asset([{"assets": [cuda, asset]}], "-bin-ubuntu-x64.tar.gz")
-        self.assertEqual(url, asset["browser_download_url"])
-        self.assertEqual(sha, "a" * 64)
+    def test_cpu_runtime_manifest_is_pinned_and_checksum_verified(self):
+        runtime = run.load_runtimes()["llama.cpp"]
+        self.assertTrue(runtime["version"].startswith("b"))
+        self.assertEqual(len(runtime["platforms"]), 6)
+        for system, artifact in runtime["platforms"].items():
+            with self.subTest(system=system):
+                self.assertTrue(artifact["url"].startswith("https://github.com/"))
+                self.assertTrue(artifact["filename"].startswith("llama-"))
+                self.assertNotIn("cuda", artifact["filename"])
+                self.assertEqual(len(artifact["sha256"]), 64)
+
+    def test_runtime_offline_requires_downloaded_binary(self):
+        with tempfile.TemporaryDirectory() as temp:
+            with patch.object(run, "CACHE", Path(temp)), \
+                 patch("run.urllib.request.urlopen", side_effect=AssertionError("network")):
+                with self.assertRaisesRegex(RuntimeError, "without --offline"):
+                    run.ensure_runtime(offline=True)
 
     def test_offline_model_uses_verified_file(self):
         with tempfile.TemporaryDirectory() as temp:
