@@ -36,13 +36,9 @@ def main():
             projector,
         )
         variants = [
-            ("legacy-vicuna", command + ["--no-jinja"]),
-            ("auto-jinja", [p for i, p in enumerate(command)
-                            if i not in (command.index("--chat-template"),
-                                         command.index("--chat-template") + 1)]),
-            ("legacy-default", [p for i, p in enumerate(command)
-                                 if i not in (command.index("--chat-template"),
-                                              command.index("--chat-template") + 1)] + ["--no-jinja"]),
+            ("legacy-embedded-vicuna", command + ["--no-jinja"]),
+            ("jinja-embedded-vicuna", command),
+            ("legacy-named-vicuna", command + ["--chat-template", "vicuna", "--no-jinja"]),
         ]
         for name, cmd in variants:
             print("=== Testing " + name + " ===", flush=True)
