@@ -12,6 +12,7 @@ import subprocess
 import sys
 import tarfile
 import tempfile
+import time
 import urllib.error
 import urllib.request
 import zipfile
@@ -307,7 +308,7 @@ def build_command(engine, model, weights, prompt, args, projector=None):
         "--gpu-layers", "0",
         "--ctx-size", str(args.ctx_size or model.get("context_size", 2048)),
         "--predict", str(args.max_tokens),
-        "--no-show-timings",
+        "--show-timings",
     ])
     if args.threads is not None:
         command.extend(["--threads", str(args.threads)])
@@ -325,6 +326,34 @@ def build_command(engine, model, weights, prompt, args, projector=None):
             "--single-turn", "--no-display-prompt",
         ])
     return command
+
+
+
+def run_inference(command, cwd, interactive=False):
+    """Report native llama.cpp token throughput and measured wall-clock time.
+
+    llama.cpp measures prompt/generation tokens per second for each answer.
+    The Python timer covers process startup, model loading, prompt processing,
+    and generation; it deliberately excludes the initial file downloads.
+    """
+    started = time.perf_counter()
+    exit_code = subprocess.call(command, cwd=str(cwd))
+    elapsed = time.perf_counter() - started
+    if exit_code == 0:
+        if interactive:
+            info(
+                "[CPU] Chat session: {:.2f} s total. "
+                "Per-response generation throughput is shown above (tokens/s).".format(
+                    elapsed
+                )
+            )
+        else:
+            info(
+                "[CPU] Response time: {:.2f} s "
+                "(includes model loading, prompt processing, and generation). "
+                "Generation speed: see llama.cpp tokens/s above.".format(elapsed)
+            )
+    return exit_code
 
 
 def main():
@@ -391,7 +420,7 @@ def main():
     if not prompt:
         info("Local chat is ready. Press Ctrl+C or type /exit to quit.")
     info("▶ Running {} ({}, CPU-only)".format(model["name"], model_id))
-    return subprocess.call(command, cwd=str(engine.parent))
+    return run_inference(command, engine.parent, interactive=not bool(prompt))
 
 
 if __name__ == "__main__":
