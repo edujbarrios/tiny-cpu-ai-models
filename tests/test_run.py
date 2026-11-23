@@ -280,7 +280,7 @@ class RunnerTests(unittest.TestCase):
 
     def test_research_only_model_is_listed_but_not_executable(self):
         models = run.load_catalog()
-        self.assertEqual(models["moondream-0.5b"]["status"], "research")
+        self.assertNotIn("moondream-0.5b", models)
         self.assertEqual(models["moondream-2b"]["status"], "research")
         output = io.StringIO()
         with patch("run.ensure_runtime", side_effect=AssertionError("runtime invoked")), \
@@ -288,9 +288,8 @@ class RunnerTests(unittest.TestCase):
              patch.object(sys, "argv", ["run.py", "--models"]):
             self.assertEqual(run.main(), 0)
         listing = output.getvalue()
-        self.assertIn("moondream-0.5b", listing)
+        self.assertNotIn("moondream-0.5b", listing)
         self.assertIn("research only", listing)
-        self.assertNotIn("Run: python run.py moondream-0.5b", listing)
         self.assertIn("moondream-2b", listing)
         self.assertNotIn("Run: python run.py moondream-2b", listing)
 
