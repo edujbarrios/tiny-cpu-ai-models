@@ -1,0 +1,13 @@
+{
+  "granite": {
+    "name": "IBM Granite 4.0 350M Instruct Q4_K_M",
+    "type": "text",
+    "parameters": "350M",
+    "license": "Apache-2.0",
+    "source": "IBM Granite (official GGUF)",
+    "filename": "granite-4.0-350m-Q4_K_M.gguf",
+    "url": "https://huggingface.co/ibm-granite/granite-4.0-350m-GGUF/resolve/main/granite-4.0-350m-Q4_K_M.gguf",
+    "sha256": "771c588a49607f274a2bba3185733607ebe6f74b996ab90e2d6bee0d98bcec52",
+    "size_mb": 237
+  }
+}
