@@ -1,19 +1,23 @@
 # Tiny CPU AI Models
 
-**Tiny, open-source AI models. Local. CPU-only. No complicated setup.**
+**Small, open-source AI models. Local inference. CPU-only. Minimal setup.**
 
-Run lightweight AI models on your own computer with just a few commands, even without a GPU.
+A growing, reproducible collection of lightweight models you can run with one consistent command:
 
-> **Our philosophy:** users should not have to install **Hugging Face libraries, Ollama, PyTorch, Transformers, Docker, or a model manager**. All you need is **Python 3.9+** and an internet connection for the initial download. No accounts, API keys, or access tokens are required. Inference runs locally; your prompts are not sent to an inference server.
+```bash
+python run.py MODEL_ID "Your prompt"
+```
 
-## ⚡ Get started in 3 commands
+> **Project philosophy:** no mandatory Hugging Face Python packages, Ollama, PyTorch, Transformers, Docker, model managers, accounts, or API keys. Just **Python 3.9+**, the model you choose, and your CPU. The launcher downloads the appropriate native runtime and model weights automatically on first use. All inference is local.
 
-**Linux / macOS (Terminal)**
+## Quick start
+
+**Linux / macOS**
 
 ```bash
 git clone https://github.com/edujbarrios/tiny-cpu-ai-models.git
 cd tiny-cpu-ai-models
-python3 run.py "Explain what a CPU is in one sentence"
+python3 run.py granite-350m "Tell me something interesting."
 ```
 
 **Windows (PowerShell)**
@@ -21,69 +25,141 @@ python3 run.py "Explain what a CPU is in one sentence"
 ```powershell
 git clone https://github.com/edujbarrios/tiny-cpu-ai-models.git
 cd tiny-cpu-ai-models
-py -3 run.py "Explain what a CPU is in one sentence"
+py -3 run.py granite-350m "Tell me something interesting."
 ```
 
-**That's it.** On the first run, the script automatically downloads a small AI model and a prebuilt CPU-only `llama.cpp` executable. Later runs reuse the cached files.
+On first use, the script downloads the model and the prebuilt CPU runtime. On later runs, it reuses the local cache. No `pip install` is needed.
 
-Don't have Git? Use **Code → Download ZIP**, extract the project, and run `python run.py` in that directory.
+Don't have Git? Select **Code → Download ZIP**, extract the files, open a terminal in the folder, and run the final command shown above.
 
-## 💬 Usage
+## Command-line interface
+
+```text
+python run.py MODEL_ID "Your prompt" [OPTIONS]
+```
 
 ```bash
-python3 run.py                            # Interactive chat with Granite
-python3 run.py "What is GGUF?"           # Ask one question and exit
-python3 run.py --list                    # List available models
-python3 run.py --model granite "Hello"   # Choose a specific model
-python3 run.py --offline "Hello"         # No downloads after first setup
-python3 run.py --max-tokens 256 "Hello"  # Limit response length
-python3 run.py --threads 4 "Hello"       # Use 4 CPU threads
+python3 run.py --list
+python3 run.py granite-350m "Explain how neural networks work."
+python3 run.py granite-350m
+python3 run.py granite-350m "Hello" --max-tokens 128
+python3 run.py granite-350m "Hello" --threads 4
+python3 run.py granite-350m "Hello" --ctx-size 2048
+python3 run.py granite-350m "Hello" --offline
+python3 run.py --help
 ```
 
-On Windows, replace `python3` with `py -3`.
+Omit the prompt for interactive chat. `--offline` disables downloads after the model and runtime have been cached. Replace `python3` with `py -3` on Windows.
+
+**One consistent interface for every registered model.** You choose a model using its catalog ID; the launcher does not hard-code Granite.
 
 ## Available models
 
-| ID | Model | Type | Parameters | Quantization | Download size | License |
+| Model ID | Model | Task | Parameters | Quantization | Approximate download | Model license |
 | --- | --- | --- | --- | --- | --- | --- |
-| `granite` | [IBM Granite 4.0 350M](https://huggingface.co/ibm-granite/granite-4.0-350m) | Text | 350M | GGUF Q4_K_M | ~237 MB | Apache-2.0 |
+| `granite-350m` | [IBM Granite 4.0 350M](https://huggingface.co/ibm-granite/granite-4.0-350m) | Text generation | 350M | GGUF Q4_K_M | 237 MB | Apache-2.0 |
 
-**We start with Granite.** More small models will follow, including vision-language models (VLMs) such as SmolVLM once an equally straightforward setup has been verified. Granite is a **text-only** model; it cannot interpret images.
+`granite` is a backwards-compatible alias for `granite-350m`.
 
-## Where do the downloads come from?
+Additional small language models and VLMs will be added as their CPU inference paths are verified. **Only Granite is registered at present.** It is a text-only model.
 
-Transparency matters:
+## Adding another model
 
-- **Inference engine:** [llama.cpp](https://github.com/ggml-org/llama.cpp), licensed under MIT. The script downloads an official **prebuilt CPU executable** from [GitHub Releases](https://github.com/ggml-org/llama.cpp/releases). No compilation is needed on supported platforms.
-- **Model weights:** downloaded over HTTPS from [IBM's official GGUF repository](https://huggingface.co/ibm-granite/granite-4.0-350m-GGUF), currently hosted on Hugging Face. **You do not need to install Hugging Face, run its CLI, or create an account.** The initial model download **does** rely on Hugging Face hosting; we make that distinction clear.
-- **Local cache:** downloads are saved in this project's `.cache/` directory and verified with SHA-256. After setup, use `--offline` to prevent any further downloads. To use a different host for model files, update the direct download URL in `models.json` and retain SHA-256 verification.
+**No changes to `run.py` are required for new llama.cpp-compatible GGUF models.** Add a record to [`models.json`](models.json), using a unique model ID, a direct HTTPS download URL, and its verified SHA-256 checksum. Then use:
 
-No extra Python packages are installed, and no remote inference service is used.
+```bash
+python3 run.py my-model "Tell me something."
+```
 
-## Requirements and compatibility
+For example, this is a *template*, not an installed model:
 
-**Initial support:** Windows x64/ARM64, macOS Intel/Apple Silicon, and Linux x64/ARM64, **where suitable prebuilt binaries are published in GitHub Releases**. Official Ubuntu builds may depend on compatible system libraries, so not every Linux distribution will work out of the box. Unsupported architectures produce a clear error rather than installing additional tools or compiling in the background.
+```json
+{
+  "my-model": {
+    "name": "Example open model",
+    "type": "text",
+    "runtime": "llama.cpp",
+    "parameters": "250M",
+    "license": "Apache-2.0",
+    "source": "Original publisher",
+    "filename": "example-Q4_K_M.gguf",
+    "url": "https://example.org/example-Q4_K_M.gguf",
+    "sha256": "REPLACE_WITH_A_VERIFIED_64_CHARACTER_SHA256_HASH",
+    "context_size": 2048
+  }
+}
+```
 
-- **Python:** version 3.9 or newer.
-- **GPU:** not required or used (`--gpu-layers 0`).
-- **RAM:** depends on the model, operating system, and context length. The GGUF file is about 237 MB; actual RAM usage is higher.
-- **Storage:** allow at least 500 MB for downloads and extracted files, plus temporary extraction space.
-- **Offline usage:** available after the model and runtime have been downloaded successfully.
+Insert this as another entry alongside `granite-350m`, not as a replacement for the complete catalog. The launcher will fetch and verify the weights on first use.
 
-Inference speed depends on your CPU. We do not claim specific tokens-per-second figures without reproducible benchmarks.
+### Vision models (VLMs)
 
-## Adding more models
+The launcher has a manifest-based path for **vision models that are compatible with llama.cpp**, including their separate visual projector. Register `"type": "vision"` and an `"mmproj"` object containing its own `filename`, `url` and `sha256`:
 
-Models are listed in [`models.json`](models.json). Each new **text GGUF** model needs a name, direct download URL, filename, and SHA-256 hash. You can then run it using `python3 run.py --model MODEL_ID`.
+```json
+{
+  "example-vlm": {
+    "name": "Example vision model",
+    "type": "vision",
+    "runtime": "llama.cpp",
+    "parameters": "256M",
+    "license": "Apache-2.0",
+    "filename": "example-vlm.gguf",
+    "url": "https://example.org/example-vlm.gguf",
+    "sha256": "REPLACE_WITH_A_VERIFIED_64_CHARACTER_SHA256_HASH",
+    "mmproj": {
+      "filename": "example-mmproj.gguf",
+      "url": "https://example.org/example-mmproj.gguf",
+      "sha256": "REPLACE_WITH_A_VERIFIED_64_CHARACTER_SHA256_HASH"
+    }
+  }
+}
+```
 
-VLMs require additional integration and testing for visual encoders and projector files; **adding a GGUF filename alone is not enough**.
+Once **actual compatible files and checksums** are provided, a registered VLM can use:
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) to contribute.
+```bash
+python3 run.py example-vlm "Describe this picture." --image photo.jpg
+```
+
+Vision support is a **generic integration point, not a claim that a specific VLM has been tested**. Some models require different runtimes or additional preprocessing, which will need separate adapters. The current version targets llama.cpp-compatible GGUF language models and supported VLM architectures; it is **not** a universal runtime for arbitrary model formats.
+
+More details and contribution guidelines: [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Direct downloads, without Hugging Face or Ollama installation
+
+- **CPU runtime:** downloads official [llama.cpp](https://github.com/ggml-org/llama.cpp) binaries from [GitHub Releases](https://github.com/ggml-org/llama.cpp/releases), verified with SHA-256.
+- **Granite weights:** downloads the official [IBM Granite GGUF](https://huggingface.co/ibm-granite/granite-4.0-350m-GGUF) directly over HTTPS and verifies SHA-256.
+- **No Hugging Face installation:** while the official IBM model files are hosted on Hugging Face, there is **no Hugging Face CLI, Python package, or account requirement**.
+- **Local cache:** downloaded files live in `.cache/`; inference runs locally and can be repeated offline with `--offline`.
+
+The code uses only Python's standard library; no `pip install`, no Ollama, and no Docker.
+
+## System requirements
+
+- Python **3.9+**.
+- Windows x64/ARM64, macOS x64/ARM64, or Linux x64/ARM64 **where matching CPU binaries are available**.
+- No GPU required (`--gpu-layers 0` and no visual projector GPU offload).
+- Allow at least 500 MB of storage for Granite and the runtime, plus temporary extraction space.
+- RAM use depends on model size, context window, and system; it exceeds the size of the GGUF file.
+
+Linux binaries provided upstream may require compatible system libraries. CPU inference speeds vary; benchmarks should state CPU, model, quantization, and measured tokens per second.
+
+## Testing
+
+```bash
+python -m unittest discover -s tests -v
+python run.py --list
+python run.py granite-350m "Hello" --max-tokens 24
+python run.py granite-350m "Hello again" --offline --max-tokens 24
+```
+
+GitHub Actions checks Python unit tests on Windows, macOS and Linux, and performs an end-to-end Granite CPU smoke test on Linux.
 
 ## Licenses
 
-Original code in this repository is licensed under [MIT](LICENSE). IBM Granite model weights are licensed under **Apache-2.0**, and llama.cpp is licensed under **MIT**. They are downloaded from their respective publishers and are not included in this source repository.
+Original code in this repository is licensed under [MIT](LICENSE). IBM Granite weights are licensed under **Apache-2.0**; llama.cpp is licensed under **MIT**. We download the respective artifacts from their upstream publishers and do not bundle them in this repository.
 
 ---
 
-**Goal:** `clone → run → experiment`. Getting started with tiny local AI should be easier than setting up an AI stack.
+**Mission:** `clone → choose a model → run`. Open, small, local AI should not require an entire AI software stack.
