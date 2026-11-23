@@ -32,6 +32,8 @@ jobs:
         with:
           python-version: '3.11'
       - name: Download and run Granite on CPU
-        run: python run.py --max-tokens 24 "Responde con una sola palabra: hola"
+        run: |
+          python run.py --max-tokens 24 "Responde con una sola palabra: hola"
       - name: Repeat without internet downloads
-        run: python run.py --offline --max-tokens 24 "Responde con una sola palabra: adios"
+        run: |
+          python run.py --offline --max-tokens 24 "Responde con una sola palabra: adios"
