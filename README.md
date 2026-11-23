@@ -86,7 +86,7 @@ python run.py qwen2.5-0.5b "Tell me something interesting."
 | Model ID | Model | Parameters | Quantization | Download size | License |
 | --- | --- | ---: | --- | --- | --- |
 | `smolvlm2-256m` | [SmolVLM2 256M Video Instruct](https://huggingface.co/HuggingFaceTB/SmolVLM2-256M-Video-Instruct) | 256M | Q4_K_M | 131 MB model + 104 MB projector | Apache-2.0 |
-| `moondream-2b` | [Moondream2 (~2B; 2024-05-08)](https://huggingface.co/cjpais/moondream2-llamafile) | ~2B | Q5_K | 1.06 GB model + 910 MB projector | Apache-2.0 |
+| `moondream-2b` | [Moondream2 (~2B; 2025-04-14)](https://huggingface.co/ggml-org/moondream2-20250414-GGUF) | ~2B | F16 | 2.84 GB model + 910 MB projector | Apache-2.0 |
 
 
 **Research candidate — not yet runnable:**
@@ -110,7 +110,7 @@ python run.py smolvlm2-256m "Describe the main object, its color, shape, and set
 python run.py moondream-2b "Describe the main object, its color, shape, and setting." --image benchmark_image/example.png
 ```
 
-The vision model and its visual projector are downloaded automatically. Moondream2 is significantly larger and may require several gigabytes of RAM; its 2024 Q5_K variant is provided as an experimental CPU option. For a fair comparison, use this image and the exact prompt above.
+The vision model and its visual projector are downloaded automatically. Moondream2 is significantly larger and may require several gigabytes of RAM; its 2025 F16 conversion is provided as an experimental CPU option. For a fair comparison, use this image and the exact prompt above.
 
 #### Tested CPU performance — vision
 
@@ -120,7 +120,7 @@ The vision model and its visual projector are downloaded automatically. Moondrea
 
 The model recognized the blue object, rock and grassy background, but classified the blue lemon as a **ball** rather than a lemon. The output above is from the provided Intel Core i7-1165G7 CPU test.
 
-**Download provenance:** Granite and Qwen use publisher-hosted GGUF repositories. SmolLM2 variants use quantizations published by QuantFactory and LM Studio Community; SmolVLM2 GGUF and projector come from ggml-org, while the Moondream2 2024 Q5_K GGUF and matching projector come from cjpais. All downloads use HTTPS with SHA-256 verification, and no Hugging Face software installation is required. The `granite` alias still resolves to `granite-350m`.
+**Download provenance:** Granite and Qwen use publisher-hosted GGUF repositories. SmolLM2 variants use quantizations published by QuantFactory and LM Studio Community; SmolVLM2 GGUF and projector come from ggml-org, while the Moondream2 2025 F16 GGUF and matching projector come from ggml-org. All downloads use HTTPS with SHA-256 verification, and no Hugging Face software installation is required. The `granite` alias still resolves to `granite-350m`.
 
 ## Adding another model
 
