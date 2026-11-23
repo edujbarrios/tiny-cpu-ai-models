@@ -105,9 +105,9 @@ The vision model and its visual projector are downloaded automatically. For a fa
 
 | Model | Benchmark image | Reference identity | Actual model response | CPU | Prompt processing | Generation speed | Response time |
 | --- | --- | --- | --- | --- | ---: | ---: | ---: |
-| `smolvlm2-256m` | [example.png](benchmark_image/example.png) | Blue lemon shaped/textured like a golf ball, on a rock in a meadow | *Not yet reported* | Intel Core i7-1165G7 (Tiger Lake; planned test) | — | — | — |
+| `smolvlm2-256m` | [example.png](benchmark_image/example.png) | Blue lemon shaped/textured like a golf ball, on a rock in a meadow | “The object is a blue-colored ball with a smooth texture, likely made from a natural material like concrete or plastic. It's placed on a rock, possibly in a grassy field or a rocky slope, with the sky visible in the background. The colors are vibrant and have a serene, natural aesthetic.” | Intel Core i7-1165G7 (Tiger Lake, 4 cores / 8 threads) | 48.6 tok/s | 65.4 tok/s | 20.15 s |
 
-The table will include the **model's verbatim answer** and its measured CPU timings when the benchmark has been run on the specified CPU. A prior Linux CI image smoke test verified that inference works, but is **not** a measurement of this image or the Intel i7-1165G7.
+The model recognized the blue object, rock and grassy background, but classified the blue lemon as a **ball** rather than a lemon. The output above is from the provided Intel Core i7-1165G7 CPU test.
 
 **Download provenance:** Granite and Qwen use publisher-hosted GGUF repositories. SmolLM2 variants use quantizations published by QuantFactory and LM Studio Community; SmolVLM2 GGUF and projector come from ggml-org. All downloads use HTTPS with SHA-256 verification, and no Hugging Face software installation is required. The `granite` alias still resolves to `granite-350m`.
 
