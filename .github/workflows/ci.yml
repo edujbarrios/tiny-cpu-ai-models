@@ -50,6 +50,7 @@ jobs:
           - smollm2-360m
           - qwen2.5-0.5b
           - smolvlm2-256m
+          - moondream-2b
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -58,14 +59,3 @@ jobs:
       - name: Download and run on CPU
         run: python tests/smoke_models.py ${{ matrix.model }}
 
-  diagnose-moondream:
-    name: Diagnose Moondream CPU image inference
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - name: Compare Moondream image prompt templates
-        run: python tests/diagnose_moondream.py
