@@ -47,6 +47,7 @@ jobs:
       matrix:
         model:
           - smollm2-135m
+          - pythia-160m
           - smollm2-360m
           - qwen2.5-0.5b
           - smolvlm2-256m
