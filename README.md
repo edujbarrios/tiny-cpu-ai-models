@@ -81,9 +81,9 @@ These are **observed runs**, not standardized benchmarks or guaranteed performan
 
 | Model | Quantization | Prompt processing | Generation speed | Response time | CPU | Source |
 | --- | --- | ---: | ---: | ---: | --- | --- |
-| `granite-350m` | Q4_K_M | 281.1 tok/s | **42.4 tok/s** | **3.58 s** | Not reported | Community-reported run |
+| `granite-350m` | Q4_K_M | 281.1 tok/s | **42.4 tok/s** | **3.58 s** | Intel Core i7-1165G7 (Tiger Lake; 4 cores / 8 threads, up to 4.7 GHz) | Community-reported run |
 
-**Measurement notes:** Response time excludes initial model/runtime downloads but includes process startup, model loading, prompt processing, and generation. The original run's CPU model, thread count, prompt, generated token count, and context settings were not provided; therefore this sample is for reference only and should not be used as a controlled comparison. Contributions with full hardware and methodology details are welcome.
+**Measurement notes:** Response time excludes initial model/runtime downloads but includes process startup, model loading, prompt processing, and generation. The original run's CPU model is now documented, but the inference thread count, exact prompt, generated token count, and context settings were not provided; therefore this sample is for reference only and should not be used as a controlled comparison. Contributions with full hardware and methodology details are welcome.
 
 ## Adding another model
 
