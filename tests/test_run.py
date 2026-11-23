@@ -276,7 +276,7 @@ class RunnerTests(unittest.TestCase):
     def test_vision_benchmark_image_exists_and_is_png(self):
         image = Path(__file__).resolve().parents[1] / "benchmark_image" / "example.png"
         self.assertTrue(image.is_file())
-        self.assertEqual(image.read_bytes()[:8], b"\\x89PNG\\r\\n\\x1a\\n")
+        self.assertEqual(image.read_bytes()[:8], b"\x89PNG\r\n\x1a\n")
 
     def test_model_checksums_and_direct_urls(self):
         models = run.load_catalog()
