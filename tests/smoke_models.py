@@ -2,6 +2,7 @@
 """End-to-end smoke test for a registered model; Python standard library only."""
 
 import json
+import re
 import struct
 import subprocess
 import sys
@@ -48,7 +49,21 @@ def main(model_id):
             create_test_image(image)
             cmd.extend(["--image", str(image)])
         print("Running smoke test: {}".format(model_id), flush=True)
-        return subprocess.call(cmd)
+        result = subprocess.run(
+            cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+            text=True, errors="replace",
+        )
+        print(result.stdout, flush=True)
+        if result.returncode:
+            return result.returncode
+        rates = re.findall(r"Generation:\\s*([0-9]+(?:\\.[0-9]+)?)\\s*t/s", result.stdout)
+        if not rates or float(rates[-1]) <= 0:
+            print("ERROR: Model produced no measurable output tokens.", file=sys.stderr)
+            return 1
+        if is_vision and "Loaded media from" not in result.stdout:
+            print("ERROR: Image input was not actually loaded.", file=sys.stderr)
+            return 1
+        return 0
 
 
 if __name__ == "__main__":
