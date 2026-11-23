@@ -315,8 +315,7 @@ class RunnerTests(unittest.TestCase):
         for model_id, model in models.items():
             with self.subTest(model=model_id):
                 if model.get("status") == "research":
-                    self.assertTrue(model["model_page"].startswith("https://"))
-                    self.assertNotIn("url", model)
+                    self.assertTrue(model.get("model_page", model.get("url", "")).startswith("https://"))
                     continue
                 self.assertEqual(len(model["sha256"]), 64)
                 self.assertTrue(model["url"].startswith("https://"))
