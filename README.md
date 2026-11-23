@@ -67,6 +67,7 @@ This prints every registered model with a **ready-to-copy test command**. The fo
 | `granite-350m` | Intel Core i7-1165G7 (Tiger Lake, 4 cores / 8 threads, up to 4.7 GHz) | Q4_K_M | 281.1 tok/s | 42.4 tok/s | 3.58 s |
 | `smollm2-135m` | Intel Core i7-1165G7 (Tiger Lake, 4 cores / 8 threads, up to 4.7 GHz) | Q4_K_M | 528.9 tok/s | 111.6 tok/s | 2.43 s |
 | `smollm2-360m` | Intel Core i7-1165G7 (Tiger Lake, 4 cores / 8 threads, up to 4.7 GHz) | Q4_K_M | 232.8 tok/s | 38.4 tok/s | 1.50 s |
+| `qwen2.5-0.5b` | Intel Core i7-1165G7 (Tiger Lake, 4 cores / 8 threads, up to 4.7 GHz) | Q4_K_M | 180.4 tok/s | 30.9 tok/s | 3.62 s |
 
 ### Run each model
 
