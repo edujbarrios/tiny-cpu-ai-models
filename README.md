@@ -128,12 +128,12 @@ More details and contribution guidelines: [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Direct downloads, without Hugging Face or Ollama installation
 
-- **CPU runtime:** downloads official [llama.cpp](https://github.com/ggml-org/llama.cpp) binaries from [GitHub Releases](https://github.com/ggml-org/llama.cpp/releases), verified with SHA-256.
+- **CPU runtime:** downloads a pinned official [llama.cpp](https://github.com/ggml-org/llama.cpp) CPU build from [GitHub Releases](https://github.com/ggml-org/llama.cpp/releases), verified with SHA-256. Version, per-platform URLs and checksums live in [`runtimes.json`](runtimes.json); the launcher does not call the GitHub API.
 - **Granite weights:** downloads the official [IBM Granite GGUF](https://huggingface.co/ibm-granite/granite-4.0-350m-GGUF) directly over HTTPS and verifies SHA-256.
 - **No Hugging Face installation:** while the official IBM model files are hosted on Hugging Face, there is **no Hugging Face CLI, Python package, or account requirement**.
 - **Local cache:** downloaded files live in `.cache/`; inference runs locally and can be repeated offline with `--offline`.
 
-The code uses only Python's standard library; no `pip install`, no Ollama, and no Docker.
+The code uses only Python's standard library; no `pip install`, no Ollama, and no Docker. Pinning the runtime version and verifying checksums improves reproducibility.
 
 ## System requirements
 
