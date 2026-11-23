@@ -303,8 +303,8 @@ class RunnerTests(unittest.TestCase):
         self.assertEqual(model["runtime"], "llama.cpp")
         self.assertEqual(len(model["sha256"]), 64)
         self.assertEqual(len(model["mmproj"]["sha256"]), 64)
-        self.assertIn("050824", model["filename"])
-        self.assertIn("050824", model["mmproj"]["filename"])
+        self.assertIn("20250414", model["mmproj"]["filename"])
+        self.assertIn("vicuna", model["filename"])
 
     def test_model_checksums_and_direct_urls(self):
         models = run.load_catalog()
