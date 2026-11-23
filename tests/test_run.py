@@ -288,11 +288,13 @@ class RunnerTests(unittest.TestCase):
             {"smolvlm2-256m", "moondream-2b"}
         )
         self.assertRegex(
-            content, r"smolvlm2-256m:\n\s+quantization: Q4_K_M\n"
+            content, r"smolvlm2-256m:\n\s+model_name: \"SmolVLM2 256M Video Instruct\"\n"
+                     r"\s+quantization: Q4_K_M\n"
                      r"\s+correct_identification: false"
         )
         self.assertRegex(
-            content, r"moondream-2b:\n\s+quantization: F16\n"
+            content, r"moondream-2b:\n\s+model_name: \"Moondream2 ~2B \(2025-04-14\)\"\n"
+                     r"\s+quantization: F16\n"
                      r"\s+correct_identification: true"
         )
         self.assertIn("generation_tps: 65.4", content)
