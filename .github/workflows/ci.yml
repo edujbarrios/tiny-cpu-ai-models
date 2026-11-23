@@ -51,6 +51,7 @@ jobs:
           - smollm2-360m
           - qwen2.5-0.5b
           - smolvlm2-256m
+          - lfm2-vl-450m
           - moondream-2b
     steps:
       - uses: actions/checkout@v4
