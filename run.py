@@ -342,6 +342,8 @@ def build_command(engine, model, weights, prompt, args, projector=None):
     ])
     if args.threads is not None:
         command.extend(["--threads", str(args.threads)])
+    if model.get("chat_template"):
+        command.extend(["--chat-template", model["chat_template"]])
     if args.image:
         if projector is None:
             raise RuntimeError("A vision model with a projector is required for --image.")
