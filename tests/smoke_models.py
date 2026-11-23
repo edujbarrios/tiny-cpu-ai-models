@@ -56,7 +56,7 @@ def main(model_id):
         print(result.stdout, flush=True)
         if result.returncode:
             return result.returncode
-        rates = re.findall(r"Generation:\\s*([0-9]+(?:\\.[0-9]+)?)\\s*t/s", result.stdout)
+        rates = re.findall(r"Generation:\s*([0-9]+(?:\.[0-9]+)?)\s*t/s", result.stdout)
         if not rates or float(rates[-1]) <= 0:
             print("ERROR: Model produced no measurable output tokens.", file=sys.stderr)
             return 1
