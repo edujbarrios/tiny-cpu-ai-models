@@ -8,6 +8,7 @@ import tarfile
 import tempfile
 import unittest
 import zipfile
+import xml.etree.ElementTree as ET
 from contextlib import redirect_stderr
 from pathlib import Path
 from unittest.mock import patch
@@ -272,6 +273,20 @@ class RunnerTests(unittest.TestCase):
         self.assertIn("--image benchmark_image/example.png", listing)
         self.assertIn("Text models:", listing)
         self.assertIn("Vision models:", listing)
+
+    def test_vision_benchmark_xml_is_valid_and_includes_cpu_results(self):
+        root = Path(__file__).resolve().parents[1]
+        tree = ET.parse(root / "benchmark_image" / "results.xml")
+        benchmark = tree.getroot()
+        self.assertEqual(benchmark.tag, "vision_benchmark")
+        self.assertIn("i7-1165G7", benchmark.attrib["cpu"])
+        results = {element.attrib["id"]: element
+                   for element in benchmark.findall("model")}
+        self.assertEqual(set(results), {"smolvlm2-256m", "moondream-2b"})
+        self.assertEqual(results["smolvlm2-256m"].findtext("correct_identification"), "❌")
+        self.assertEqual(results["moondream-2b"].findtext("correct_identification"), "✅")
+        self.assertIn("blue lemon", results["moondream-2b"].findtext("response"))
+        self.assertEqual(results["moondream-2b"].find("performance").attrib["generation_tps"], "7.4")
 
     def test_vision_benchmark_image_exists_and_is_png(self):
         image = Path(__file__).resolve().parents[1] / "benchmark_image" / "example.png"
