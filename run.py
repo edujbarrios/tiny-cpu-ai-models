@@ -254,7 +254,12 @@ def load_catalog():
             raise RuntimeError("Invalid entry in models.json.")
         if spec.get("type") not in ("text", "vision"):
             raise RuntimeError("Unsupported model type for " + model_id)
-        if spec.get("runtime", "llama.cpp") != "llama.cpp":
+        if spec.get("status", "available") not in ("available", "research"):
+            raise RuntimeError("Invalid status for " + model_id)
+        if (
+            spec.get("status", "available") == "available"
+            and spec.get("runtime", "llama.cpp") != "llama.cpp"
+        ):
             raise RuntimeError(
                 "Unsupported runtime for " + model_id
                 + ". The current launcher supports llama.cpp-compatible GGUF files."
@@ -265,7 +270,8 @@ def load_catalog():
             or any(not isinstance(alias, str) or not alias for alias in aliases)
         ):
             raise RuntimeError("Invalid aliases for " + model_id)
-        if spec.get("type") == "vision" and "mmproj" not in spec:
+        if (spec.get("status", "available") == "available"
+                and spec.get("type") == "vision" and "mmproj" not in spec):
             raise RuntimeError("Vision model " + model_id + " requires an mmproj artifact.")
     return models
 
@@ -315,7 +321,10 @@ def list_models(models):
             print("  {} | {} | {}{}".format(
                 model_id, spec["parameters"], spec["name"], alias_text
             ))
-            print("    Run: {}".format(example_command(model_id, spec)))
+            if spec.get("status", "available") == "research":
+                print("    Status: research only (not runnable with the current CPU runner)")
+            else:
+                print("    Run: {}".format(example_command(model_id, spec)))
         print()
 
 
@@ -422,6 +431,13 @@ def main():
         model_id, model = resolve_model(models, args.model)
     except RuntimeError as error:
         parser.error(str(error))
+
+    if model.get("status", "available") == "research":
+        parser.error(
+            "Model '{}' is research-only, not runnable yet. {}".format(
+                model_id, model.get("notes", "No supported runtime is configured.")
+            )
+        )
 
     if args.image:
         if model["type"] != "vision":
