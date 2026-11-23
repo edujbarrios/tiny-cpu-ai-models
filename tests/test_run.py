@@ -144,7 +144,7 @@ class RunnerTests(unittest.TestCase):
              ]):
             self.assertEqual(run.main(), 0)
         command = call.call_args.args[0]
-        self.assertEqual(command[command.index("--model") + 1], "/tmp/future.gguf")
+        self.assertEqual(command[command.index("--model") + 1], str(Path("/tmp/future.gguf")))
         self.assertEqual(command[command.index("--prompt") + 1], "Tell me something")
         self.assertEqual(command[command.index("--predict") + 1], "24")
 
@@ -185,7 +185,7 @@ class RunnerTests(unittest.TestCase):
                 self.assertEqual(run.main(), 0)
             command = call.call_args.args[0]
             artifact.assert_called_once()
-            self.assertEqual(command[command.index("--mmproj") + 1], "/tmp/mmproj.gguf")
+            self.assertEqual(command[command.index("--mmproj") + 1], str(Path("/tmp/mmproj.gguf")))
             self.assertEqual(command[command.index("--image") + 1], str(photo.resolve()))
             self.assertIn("--no-mmproj-offload", command)
             self.assertEqual(command[command.index("--gpu-layers") + 1], "0")
