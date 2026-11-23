@@ -91,5 +91,16 @@
       "sha256": "151e39246d5c80f215b4e7c73b913703055694239a3de4422005f78353e4e901",
       "size_mb": 910
     }
+  },
+  "moondream-0.5b": {
+    "name": "Moondream 0.5B (edge / fine-tuning research)",
+    "type": "vision",
+    "status": "research",
+    "parameters": "500M",
+    "license": "Apache-2.0",
+    "source": "Moondream official 0.5B release; ONNX distribution via whistleroosh/moondream-0.5B",
+    "model_page": "https://moondream.ai/models",
+    "files_page": "https://huggingface.co/whistleroosh/moondream-0.5B/tree/main",
+    "notes": "No verified llama.cpp-compatible GGUF and projector pair available for the pinned runner; NOT executable via run.py yet."
   }
 }
