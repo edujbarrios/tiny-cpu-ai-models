@@ -44,6 +44,27 @@ Omit the prompt for interactive chat. `--offline` disables downloads after the m
 
 **One consistent interface for every registered model.** You choose a model using its catalog ID; the launcher does not hard-code Granite.
 
+## CPU performance metrics
+
+Every run prints **tokens per second** directly from llama.cpp:
+
+```text
+[ Prompt: ... t/s | Generation: ... t/s ]
+```
+
+For a one-shot prompt, the launcher additionally reports:
+
+```text
+[CPU] Response time: ... s (includes model loading, prompt processing, and generation).
+```
+
+- **Generation (tokens/s):** llama.cpp's measured token decoding throughput. This is the metric to compare model generation speed.
+- **Prompt (tokens/s):** prompt-processing throughput, reported separately.
+- **Response time (seconds):** wall-clock time from launching the inference process until it finishes, **excluding downloads but including model loading and prompt processing**. It is *not* decode-only time.
+- **Interactive chat:** llama.cpp prints token speed for each answer; the launcher displays the total chat-session duration when you exit.
+
+To compare models scientifically, keep the same prompt, context window, quantization, number of CPU threads, and machine. Repeat warmed-up runs because loading and disk caching influence total elapsed time.
+
 ## Available models
 
 | Model ID | Model | Task | Parameters | Quantization | Approximate download | Model license |
