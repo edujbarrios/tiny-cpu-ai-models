@@ -25,7 +25,7 @@ python run.py qwen3.5-0.8b "Describe the main object, its color, shape, and sett
 
 All vision models download their weights and visual projectors automatically. Use the same image and exact prompt for comparison.
 
-**Qwen3.5 retest completed:** The original run used the 192-token default and ended during thinking. With a 1024-token budget, the model completed both thinking and its final answer. The table reports the latest completed run; the earlier incomplete run is retained below for reference. Other models use the 192-token default, so the response-time comparison does not control for output length or reasoning budget.
+**Qwen3.5 token budget:** This model uses a 1024-token output budget to accommodate thinking and the final answer. Other models use the 192-token default, so the response-time comparison does not control for output length or reasoning budget.
 
 ## Performance and qualitative analysis
 
@@ -36,7 +36,7 @@ All vision models download their weights and visual projectors automatically. Us
 | `lfm2-vl-450m` | Q4_0 | ❌ | **Standout descriptive detail**; recognizes fruit-like shape but invents a pair and plastic material | 157.9 tok/s | 51.4 tok/s | 13.80 s |
 | `qwen3.5-0.8b` | Q4_K_M | ❌ | **Standout explicit reasoning**; detailed visual analysis, but identifies a blueberry instead of a lemon | 72.7 tok/s | 21.5 tok/s | 57.88 s |
 
-**Qualitative observation:** Qwen3.5 and LFM2-VL stand out for the detail and organization of their visual analysis in these samples. Qwen3.5 explicitly reasons about the object, texture, color and scene; LFM2-VL produces a fluent and detailed scene description quickly. This is not a validated reasoning ranking: LFM2-VL misidentifies the number and nature of the object, while Qwen3.5's completed retest misidentifies the lemon as a blueberry. Qwen3.5 mentioned a lemon in its earlier incomplete run, but did not confirm it in a final answer. Moondream2 remains the only model with a correct completed identification in these samples.
+**Qualitative observation:** Qwen3.5 and LFM2-VL stand out for the detail and organization of their visual analysis in these samples. Qwen3.5 explicitly reasons about the object, texture, color and scene; LFM2-VL produces a fluent and detailed scene description quickly. This is not a validated reasoning ranking: LFM2-VL misidentifies the number and nature of the object, while Qwen3.5's completed response misidentifies the lemon as a blueberry. Moondream2 remains the only model with a correct completed identification in these samples.
 
 LFM2-VL has the fastest recorded prompt processing and shortest end-to-end response time. SmolVLM2 has the highest generation throughput. Qwen3.5's generation rate and response time include thinking and final-answer generation. Its larger token budget makes end-to-end latency comparisons less controlled. A single image and limited runs do not establish general visual reasoning ability.
 
@@ -66,7 +66,7 @@ The main object is a pair of blue, plastic fruit spheres. They are round and vib
 
 ### Qwen3.5 0.8B — Q4_K_M
 
-#### Completed retest — 1024-token budget
+#### Model output — 1024-token budget
 
 [Start thinking]
 
@@ -135,26 +135,6 @@ The image features a single, round object that appears to be a blueberry (specif
 - Identification: incorrect (blueberry instead of blue lemon).
 - Response: complete.
 - Prompt: 72.7 tok/s; generation: 21.5 tok/s; response time: 57.88 s.
-
-#### Earlier incomplete run — 192-token budget
-
-[Start thinking]
-
-The user wants a description of the main object in the image.
-
-1.  **Identify the object:** It's a sphere. It looks like a lemon. The texture is bumpy and textured, not smooth like a plastic ball.
-2.  **Identify the color:** It's a very vibrant, deep blue. It looks almost plasticized or coated. It contrasts sharply with the earthy tones of the rock and grass.
-3.  **Identify the shape:** It is perfectly spherical.
-4.  **Identify the setting:**
-    *   It's sitting on a large, grey rock.
-    *   The rock is on a grassy hill.
-    *   There is a bright, sunny day with a clear blue sky.
-    *   The background is a lush green landscape, slightly out of focus (bokeh), suggesting a landscape park or nature trail.
-
-\*\*Drafting the
-
-- Identification: lemon mentioned in thinking only; no final answer, so completed identification cannot be scored.
-- Prompt: 63.5 tok/s; generation: 21.6 tok/s; response time: 36.26 s.
 
 ## Recording new runs
 
