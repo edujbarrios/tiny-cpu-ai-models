@@ -264,6 +264,9 @@ def load_catalog():
                 "Unsupported runtime for " + model_id
                 + ". The current launcher supports llama.cpp-compatible GGUF files."
             )
+        max_tokens = spec.get("max_tokens", 192)
+        if type(max_tokens) is not int or max_tokens <= 0:
+            raise RuntimeError("Invalid max_tokens for " + model_id)
         aliases = spec.get("aliases", [])
         if (
             not isinstance(aliases, list)
@@ -339,7 +342,8 @@ def build_command(engine, model, weights, prompt, args, projector=None):
         "--model", str(weights),
         "--gpu-layers", "0",
         "--ctx-size", str(args.ctx_size or model.get("context_size", 2048)),
-        "--predict", str(args.max_tokens),
+        "--predict", str(args.max_tokens if args.max_tokens is not None
+                         else model.get("max_tokens", 192)),
         "--show-timings",
     ])
     if args.threads is not None:
@@ -403,14 +407,15 @@ def main():
                         help="List all models with copy-and-paste test commands")
     parser.add_argument("--offline", action="store_true", help="Never download any files")
     parser.add_argument("--image", metavar="PATH", help="Image path (vision models only)")
-    parser.add_argument("--max-tokens", type=int, default=192, help="Maximum output tokens")
+    parser.add_argument("--max-tokens", type=int, default=None,
+                        help="Maximum output tokens (model default, otherwise 192)")
     parser.add_argument("--ctx-size", type=int, default=None, help="Context size in tokens")
     parser.add_argument("--threads", type=int, default=None, help="Number of CPU threads")
     parser.add_argument("--model", dest="legacy_model", default=None, help=argparse.SUPPRESS)
     args = parser.parse_intermixed_args()
 
     if (
-        args.max_tokens <= 0
+        (args.max_tokens is not None and args.max_tokens <= 0)
         or (args.ctx_size is not None and args.ctx_size <= 0)
         or (args.threads is not None and args.threads <= 0)
     ):
