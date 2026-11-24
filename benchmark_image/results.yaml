@@ -32,3 +32,12 @@ benchmark:
         prompt_tps: 40.6
         generation_tps: 7.4
         response_time_s: 34.41
+    qwen3.5-0.8b:
+      model_name: "Qwen3.5 0.8B"
+      quantization: Q4_K_M
+      correct_identification: null  # Pending benchmark
+      response: null
+      performance:
+        prompt_tps: null
+        generation_tps: null
+        response_time_s: null
