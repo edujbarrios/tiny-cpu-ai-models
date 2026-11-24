@@ -35,9 +35,25 @@ benchmark:
     qwen3.5-0.8b:
       model_name: "Qwen3.5 0.8B"
       quantization: Q4_K_M
-      correct_identification: null  # Pending benchmark
-      response: null
+      correct_identification: true  # ✅ Identified in reasoning; no final answer
+      response_complete: false
+      response: |-
+        [Start thinking]
+
+        The user wants a description of the main object in the image.
+
+        1.  **Identify the object:** It's a sphere. It looks like a lemon. The texture is bumpy and textured, not smooth like a plastic ball.
+        2.  **Identify the color:** It's a very vibrant, deep blue. It looks almost plasticized or coated. It contrasts sharply with the earthy tones of the rock and grass.
+        3.  **Identify the shape:** It is perfectly spherical.
+        4.  **Identify the setting:**
+            *   It's sitting on a large, grey rock.
+            *   The rock is on a grassy hill.
+            *   There is a bright, sunny day with a clear blue sky.
+            *   The background is a lush green landscape, slightly out of focus (bokeh), suggesting a landscape park or nature trail.
+
+        **Drafting the
+      notes: "Output ended during thinking; no final answer was produced. Generation throughput includes thinking tokens."
       performance:
-        prompt_tps: null
-        generation_tps: null
-        response_time_s: null
+        prompt_tps: 63.5
+        generation_tps: 21.6
+        response_time_s: 36.26
