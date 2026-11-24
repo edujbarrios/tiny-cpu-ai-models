@@ -89,6 +89,7 @@ python run.py qwen2.5-0.5b "Tell me something interesting."
 | `smolvlm2-256m` | [SmolVLM2 256M Video Instruct](https://huggingface.co/HuggingFaceTB/SmolVLM2-256M-Video-Instruct) | 256M | Q4_K_M | 131 MB model + 104 MB projector | Apache-2.0 |
 | `moondream-2b` | [Moondream2 (2025-04-14)](https://huggingface.co/ggml-org/moondream2-20250414-GGUF) | ~2B | F16 | 2.84 GB model + 910 MB projector | Apache-2.0 |
 | `lfm2-vl-450m` | [LiquidAI LFM2-VL 450M](https://huggingface.co/LiquidAI/LFM2-VL-450M-GGUF) | 450M | Q4_0 | 219 MB model + 104 MB projector | [LFM Open License v1.0](https://www.liquid.ai/lfm-license) |
+| `qwen3.5-0.8b` | [Qwen3.5 0.8B](https://huggingface.co/Qwen/Qwen3.5-0.8B) | 800M | Q4_K_M | 528 MB model + 116 MB projector | Apache-2.0 |
 
 
 Moondream2 uses the GGUF's embedded Vicuna template with `--no-jinja` for correct CPU image inference. This setting is applied automatically by the runner. It requires considerably more RAM and storage than SmolVLM2.
@@ -107,13 +108,21 @@ Moondream2 uses the GGUF's embedded Vicuna template with `--no-jinja` for correc
 python run.py smolvlm2-256m "Describe the main object, its color, shape, and setting." --image benchmark_image/example.png
 python run.py moondream-2b "Describe the main object, its color, shape, and setting." --image benchmark_image/example.png
 python run.py lfm2-vl-450m "Describe the main object, its color, shape, and setting." --image benchmark_image/example.png
+python run.py qwen3.5-0.8b "Describe the main object, its color, shape, and setting." --image benchmark_image/example.png
 ```
 
-All vision models download their weights and visual projectors automatically. For a fair comparison, use the same benchmark image and exact prompt. Only SmolVLM2 and Moondream2 have reported measurements on the Intel Core i7-1165G7; LFM2-VL awaits a benchmark on that CPU.
+All vision models download their weights and visual projectors automatically. For a fair comparison, use the same benchmark image and exact prompt. Only SmolVLM2 and Moondream2 have reported measurements on the Intel Core i7-1165G7; LFM2-VL and Qwen3.5 await benchmarks on that CPU.
 
 #### Tested CPU performance — vision
 
-The same blue-lemon benchmark is recorded as parameterized YAML, with one entry per model. `correct_identification` is a boolean: `true` ✅ for recognizing the blue lemon, `false` ❌ otherwise. Timings include model loading, prompt processing, and generation.
+The blue-lemon benchmark is recorded as parameterized YAML. `correct_identification` is `true` ✅ for recognizing the blue lemon, `false` ❌ otherwise, or `null` when the benchmark is pending. Timings include model loading, prompt processing, and generation.
+
+| Model | Quantization | Correct identification | Prompt processing | Generation speed | Response time |
+| --- | --- | --- | ---: | ---: | ---: |
+| `smolvlm2-256m` | Q4_K_M | ❌ | 48.6 tok/s | 65.4 tok/s | 20.15 s |
+| `moondream-2b` | F16 | ✅ | 40.6 tok/s | 7.4 tok/s | 34.41 s |
+| `lfm2-vl-450m` | Q4_0 | Pending | — | — | — |
+| `qwen3.5-0.8b` | Q4_K_M | Pending | — | — | — |
 
 [View or reuse results.yaml](benchmark_image/results.yaml).
 
@@ -152,9 +161,18 @@ benchmark:
         prompt_tps: 40.6
         generation_tps: 7.4
         response_time_s: 34.41
+    qwen3.5-0.8b:
+      model_name: "Qwen3.5 0.8B"
+      quantization: Q4_K_M
+      correct_identification: null  # Pending benchmark
+      response: null
+      performance:
+        prompt_tps: null
+        generation_tps: null
+        response_time_s: null
 ```
 
-**Download provenance:** Granite and Qwen use publisher-hosted GGUF repositories. SmolLM2 variants use quantizations published by QuantFactory and LM Studio Community; SmolVLM2 GGUF and projector come from ggml-org, while the Moondream2 2025 F16 GGUF and matching projector come from ggml-org. LFM2-VL GGUF and projector are published by LiquidAI. All downloads use HTTPS with SHA-256 verification, and no Hugging Face software installation is required. The `granite` alias still resolves to `granite-350m`.
+**Download provenance:** Granite and Qwen2.5 use publisher-hosted GGUF repositories. Qwen3.5 uses community GGUF weights and a matching Q8_0 visual projector from mradermacher. SmolLM2 variants use quantizations published by QuantFactory and LM Studio Community; SmolVLM2 GGUF and projector come from ggml-org, while the Moondream2 2025 F16 GGUF and matching projector come from ggml-org. LFM2-VL GGUF and projector are published by LiquidAI. All downloads use HTTPS with SHA-256 verification, and no Hugging Face software installation is required. The `granite` alias still resolves to `granite-350m`.
 
 ## Adding another model
 
