@@ -39,6 +39,10 @@ Add the entry alongside existing models. The launcher discovers it automatically
 
 Before opening a pull request, run `python -m unittest discover -s tests`, `python run.py --list`, and a real CPU inference with `python run.py MODEL_ID "Your question"`.
 
+## Benchmark documentation
+
+Record text-model results in [benchmarks/llms.md](benchmarks/llms.md) and vision-model results in [benchmarks/vlms.md](benchmarks/vlms.md). Include exact prompts, model outputs when available, hardware, quantization and measured throughput. Mark incomplete responses and distinguish descriptive detail from correctness. Keep the main README focused on the catalog and usage.
+
 ## Minimal-dependency philosophy
 
 - Use the Python standard library for the launcher.
