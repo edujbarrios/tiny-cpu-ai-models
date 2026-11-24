@@ -276,35 +276,34 @@ class RunnerTests(unittest.TestCase):
         self.assertIn("python run.py lfm2-vl-450m", listing)
         self.assertIn("Vision models:", listing)
 
-    def test_vision_benchmark_yaml_contains_actual_cpu_results(self):
+    def test_vision_benchmark_markdown_contains_actual_cpu_results(self):
         root = Path(__file__).resolve().parents[1]
-        content = (root / "benchmark_image" / "results.yaml").read_text(
-            encoding="utf-8"
-        )
-        self.assertTrue(content.startswith("benchmark:\n"))
-        self.assertIn("image: benchmark_image/example.png", content)
+        content = (root / "benchmarks" / "vlms.md").read_text(encoding="utf-8")
+        self.assertIn("../benchmark_image/example.png", content)
         self.assertIn("Intel Core i7-1165G7", content)
-        self.assertIn("Blue lemon", content)
-        self.assertEqual(
-            set(re.findall(r"^    ([\w.-]+):$", content, flags=re.MULTILINE)),
-            {"smolvlm2-256m", "moondream-2b"}
-        )
-        self.assertRegex(
-            content, r"smolvlm2-256m:\n\s+model_name: \"SmolVLM2 256M Video Instruct\"\n"
-                     r"\s+quantization: Q4_K_M\n"
-                     r"\s+correct_identification: false"
-        )
-        self.assertRegex(
-            content, r"moondream-2b:\n\s+model_name: \"Moondream2 ~2B \(2025-04-14\)\"\n"
-                     r"\s+quantization: F16\n"
-                     r"\s+correct_identification: true"
-        )
-        self.assertIn("generation_tps: 65.4", content)
-        self.assertIn("response_time_s: 20.15", content)
-        self.assertIn("generation_tps: 7.4", content)
-        self.assertIn("response_time_s: 34.41", content)
+        self.assertIn("blue lemon", content)
+        for model_id in ("smolvlm2-256m", "moondream-2b", "lfm2-vl-450m", "qwen3.5-0.8b"):
+            self.assertIn("| `" + model_id + "` |", content)
         self.assertIn("The main object is a blue lemon", content)
-        self.assertIn("response: >-", content)
+        self.assertIn("65.4 tok/s", content)
+        self.assertIn("7.4 tok/s", content)
+        self.assertIn("51.4 tok/s", content)
+
+    def test_model_specific_max_tokens_and_cli_override(self):
+        models = run.load_catalog()
+        for model_id, extra_args, expected in (
+            ("granite-350m", [], "192"),
+            ("qwen3.5-0.8b", [], "1024"),
+            ("qwen3.5-0.8b", ["--max-tokens", "512"], "512"),
+        ):
+            with self.subTest(model=model_id, args=extra_args), \
+                 patch("run.ensure_runtime", return_value=Path("/tmp/llama-cli")), \
+                 patch("run.ensure_model", return_value=Path("/tmp/model.gguf")), \
+                 patch("run.subprocess.call", return_value=0) as call, \
+                 patch.object(sys, "argv", ["run.py", model_id, "Hello"] + extra_args):
+                self.assertEqual(run.main(), 0)
+                command = call.call_args.args[0]
+                self.assertEqual(command[command.index("--predict") + 1], expected)
 
     def test_vision_benchmark_image_exists_and_is_png(self):
         image = Path(__file__).resolve().parents[1] / "benchmark_image" / "example.png"
