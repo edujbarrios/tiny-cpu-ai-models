@@ -111,7 +111,7 @@ python run.py lfm2-vl-450m "Describe the main object, its color, shape, and sett
 python run.py qwen3.5-0.8b "Describe the main object, its color, shape, and setting." --image benchmark_image/example.png
 ```
 
-All vision models download their weights and visual projectors automatically. For a fair comparison, use the same benchmark image and exact prompt. Only SmolVLM2 and Moondream2 have reported measurements on the Intel Core i7-1165G7; LFM2-VL and Qwen3.5 await benchmarks on that CPU.
+All vision models download their weights and visual projectors automatically. For a fair comparison, use the same benchmark image and exact prompt. SmolVLM2, Moondream2 and Qwen3.5 have reported benchmark measurements; LFM2-VL awaits a benchmark.
 
 #### Tested CPU performance — vision
 
@@ -122,7 +122,9 @@ The blue-lemon benchmark is recorded as parameterized YAML. `correct_identificat
 | `smolvlm2-256m` | Q4_K_M | ❌ | 48.6 tok/s | 65.4 tok/s | 20.15 s |
 | `moondream-2b` | F16 | ✅ | 40.6 tok/s | 7.4 tok/s | 34.41 s |
 | `lfm2-vl-450m` | Q4_0 | Pending | — | — | — |
-| `qwen3.5-0.8b` | Q4_K_M | Pending | — | — | — |
+| `qwen3.5-0.8b` | Q4_K_M | ✅ (thinking only) | 63.5 tok/s | 21.6 tok/s | 36.26 s |
+
+**Qwen3.5 benchmark note:** The model identified a lemon and its deep blue color during thinking, but the output ended before a final answer was produced. The measured generation throughput includes thinking tokens, and the response time is for this incomplete run.
 
 [View or reuse results.yaml](benchmark_image/results.yaml).
 
@@ -164,12 +166,28 @@ benchmark:
     qwen3.5-0.8b:
       model_name: "Qwen3.5 0.8B"
       quantization: Q4_K_M
-      correct_identification: null  # Pending benchmark
-      response: null
+      correct_identification: true  # ✅ Identified in reasoning; no final answer
+      response_complete: false
+      response: |-
+        [Start thinking]
+
+        The user wants a description of the main object in the image.
+
+        1.  **Identify the object:** It's a sphere. It looks like a lemon. The texture is bumpy and textured, not smooth like a plastic ball.
+        2.  **Identify the color:** It's a very vibrant, deep blue. It looks almost plasticized or coated. It contrasts sharply with the earthy tones of the rock and grass.
+        3.  **Identify the shape:** It is perfectly spherical.
+        4.  **Identify the setting:**
+            *   It's sitting on a large, grey rock.
+            *   The rock is on a grassy hill.
+            *   There is a bright, sunny day with a clear blue sky.
+            *   The background is a lush green landscape, slightly out of focus (bokeh), suggesting a landscape park or nature trail.
+
+        **Drafting the
+      notes: "Output ended during thinking; no final answer was produced. Generation throughput includes thinking tokens."
       performance:
-        prompt_tps: null
-        generation_tps: null
-        response_time_s: null
+        prompt_tps: 63.5
+        generation_tps: 21.6
+        response_time_s: 36.26
 ```
 
 **Download provenance:** Granite and Qwen2.5 use publisher-hosted GGUF repositories. Qwen3.5 uses community GGUF weights and a matching Q8_0 visual projector from mradermacher. SmolLM2 variants use quantizations published by QuantFactory and LM Studio Community; SmolVLM2 GGUF and projector come from ggml-org, while the Moondream2 2025 F16 GGUF and matching projector come from ggml-org. LFM2-VL GGUF and projector are published by LiquidAI. All downloads use HTTPS with SHA-256 verification, and no Hugging Face software installation is required. The `granite` alias still resolves to `granite-350m`.
