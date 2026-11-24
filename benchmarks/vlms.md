@@ -20,10 +20,12 @@
 python run.py smolvlm2-256m "Describe the main object, its color, shape, and setting." --image benchmark_image/example.png
 python run.py moondream-2b "Describe the main object, its color, shape, and setting." --image benchmark_image/example.png
 python run.py lfm2-vl-450m "Describe the main object, its color, shape, and setting." --image benchmark_image/example.png
-python run.py qwen3.5-0.8b "Describe the main object, its color, shape, and setting." --image benchmark_image/example.png
+python run.py qwen3.5-0.8b "Describe the main object, its color, shape, and setting." --image benchmark_image/example.png --max-tokens 1024
 ```
 
 All vision models download their weights and visual projectors automatically. Use the same image and exact prompt for comparison.
+
+**Qwen3.5 retest pending:** The previous run used the original 192-token default and ended during thinking. The new default for Qwen3.5 is 1024 output tokens (thinking and final answer combined). The command above explicitly sets that budget. The previous measurements and incomplete output remain below until a new run is recorded.
 
 ## Performance and qualitative analysis
 
