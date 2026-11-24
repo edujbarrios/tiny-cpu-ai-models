@@ -42,6 +42,8 @@ python run.py granite-350m "Hello" --offline
 python run.py --help
 ```
 
+The default output budget is 192 tokens for most models and 1024 for Qwen3.5-0.8B (including thinking tokens). Use `--max-tokens` to override the model default.
+
 Omit the prompt for interactive chat. `--offline` disables downloads after the model and runtime have been cached.
 
 **One consistent interface for every registered model.** Use `python run.py --models` to list models and see a ready-to-copy test command for each one (`--list` is also supported). The launcher does not hard-code a particular model.
@@ -95,7 +97,7 @@ Moondream2 uses the GGUF's embedded Vicuna template with `--no-jinja` for correc
 python run.py smolvlm2-256m "Describe the main object, its color, shape, and setting." --image benchmark_image/example.png
 python run.py moondream-2b "Describe the main object, its color, shape, and setting." --image benchmark_image/example.png
 python run.py lfm2-vl-450m "Describe the main object, its color, shape, and setting." --image benchmark_image/example.png
-python run.py qwen3.5-0.8b "Describe the main object, its color, shape, and setting." --image benchmark_image/example.png
+python run.py qwen3.5-0.8b "Describe the main object, its color, shape, and setting." --image benchmark_image/example.png --max-tokens 1024
 ```
 
 **[Vision model CPU benchmarks, blue-lemon test and full responses →](benchmarks/vlms.md)**
