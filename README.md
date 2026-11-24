@@ -63,14 +63,7 @@ The catalog separates **text** and **vision** models and prints a ready-to-copy 
 | `smollm2-360m` | [SmolLM2 360M Instruct](https://huggingface.co/HuggingFaceTB/SmolLM2-360M-Instruct) | 360M | Q4_K_M | 271 MB | Apache-2.0 |
 | `qwen2.5-0.5b` | [Qwen2.5 0.5B Instruct](https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct) | 500M | Q4_K_M | 491 MB | Apache-2.0 |
 
-#### Tested CPU performance — text
-
-| Model | CPU | Quantization | Prompt processing | Generation speed | Response time |
-| --- | --- | --- | ---: | ---: | ---: |
-| `granite-350m` | Intel Core i7-1165G7 (Tiger Lake, 4 cores / 8 threads, up to 4.7 GHz) | Q4_K_M | 281.1 tok/s | 42.4 tok/s | 3.58 s |
-| `smollm2-135m` | Intel Core i7-1165G7 (Tiger Lake, 4 cores / 8 threads, up to 4.7 GHz) | Q4_K_M | 528.9 tok/s | 111.6 tok/s | 2.43 s |
-| `smollm2-360m` | Intel Core i7-1165G7 (Tiger Lake, 4 cores / 8 threads, up to 4.7 GHz) | Q4_K_M | 232.8 tok/s | 38.4 tok/s | 1.50 s |
-| `qwen2.5-0.5b` | Intel Core i7-1165G7 (Tiger Lake, 4 cores / 8 threads, up to 4.7 GHz) | Q4_K_M | 180.4 tok/s | 30.9 tok/s | 3.62 s |
+**[Text model CPU benchmarks and analysis →](benchmarks/llms.md)**
 
 
 #### Run a text model
@@ -96,13 +89,7 @@ Moondream2 uses the GGUF's embedded Vicuna template with `--no-jinja` for correc
 
 **LFM2-VL license:** LFM Open License v1.0 permits research, modification and fine-tuning, but is **not Apache-2.0 or MIT**. Free commercial use is limited by a **$10 million annual company revenue threshold**; check the [publisher's full license](https://www.liquid.ai/lfm-license) before commercial use. This repository links to upstream weights and does not redistribute them.
 
-#### Visual recognition benchmark
-
-![Blue lemon-shaped object on a stone in a green meadow](benchmark_image/example.png)
-
-**Reference description (ground truth supplied by the image creator):** A bright blue lemon, deliberately textured to resemble a golf ball, resting on a rock in a sunny green meadow. The unusual color and hybrid appearance are intended to challenge visual object recognition. **The correct identification is a blue lemon, not a golf ball.**
-
-**Benchmark prompt (English):** `Describe the main object, its color, shape, and setting.`
+#### Run a vision model
 
 ```bash
 python run.py smolvlm2-256m "Describe the main object, its color, shape, and setting." --image benchmark_image/example.png
@@ -111,84 +98,7 @@ python run.py lfm2-vl-450m "Describe the main object, its color, shape, and sett
 python run.py qwen3.5-0.8b "Describe the main object, its color, shape, and setting." --image benchmark_image/example.png
 ```
 
-All vision models download their weights and visual projectors automatically. For a fair comparison, use the same benchmark image and exact prompt. SmolVLM2, Moondream2 and Qwen3.5 have reported benchmark measurements; LFM2-VL awaits a benchmark.
-
-#### Tested CPU performance — vision
-
-The blue-lemon benchmark is recorded as parameterized YAML. `correct_identification` is `true` ✅ for recognizing the blue lemon, `false` ❌ otherwise, or `null` when the benchmark is pending. Timings include model loading, prompt processing, and generation.
-
-| Model | Quantization | Correct identification | Prompt processing | Generation speed | Response time |
-| --- | --- | --- | ---: | ---: | ---: |
-| `smolvlm2-256m` | Q4_K_M | ❌ | 48.6 tok/s | 65.4 tok/s | 20.15 s |
-| `moondream-2b` | F16 | ✅ | 40.6 tok/s | 7.4 tok/s | 34.41 s |
-| `lfm2-vl-450m` | Q4_0 | Pending | — | — | — |
-| `qwen3.5-0.8b` | Q4_K_M | ✅ (thinking only) | 63.5 tok/s | 21.6 tok/s | 36.26 s |
-
-**Qwen3.5 benchmark note:** The model identified a lemon and its deep blue color during thinking, but the output ended before a final answer was produced. The measured generation throughput includes thinking tokens, and the response time is for this incomplete run.
-
-[View or reuse results.yaml](benchmark_image/results.yaml).
-
-```yaml
-benchmark:
-  image: benchmark_image/example.png
-  cpu: "Intel Core i7-1165G7 (Tiger Lake, 4 cores / 8 threads)"
-  ground_truth: "Blue lemon with golf-ball-like texture on a rock in a grassy meadow"
-  prompt: "Describe the main object, its color, shape, and setting."
-  correct_if: "Correct if the main object is identified as a blue lemon"
-  models:
-    smolvlm2-256m:
-      model_name: "SmolVLM2 256M Video Instruct"
-      quantization: Q4_K_M
-      correct_identification: false  # ❌
-      response: >-
-        The object is a blue-colored ball with a smooth texture, likely made from a
-        natural material like concrete or plastic. It's placed on a rock, possibly in a
-        grassy field or a rocky slope, with the sky visible in the background. The
-        colors are vibrant and have a serene, natural aesthetic.
-      performance:
-        prompt_tps: 48.6
-        generation_tps: 65.4
-        response_time_s: 20.15
-    moondream-2b:
-      model_name: "Moondream2 ~2B (2025-04-14)"
-      quantization: F16
-      correct_identification: true  # ✅
-      response: >-
-        The main object is a blue lemon sitting on a rock in a grassy field. The lemon
-        is round in shape and has a vibrant blue color, making it a visually striking
-        and unique scene in the image. The setting appears to be a grassy field or
-        pasture, providing a natural backdrop that complements the bright blue hue of
-        the lemon.
-      performance:
-        prompt_tps: 40.6
-        generation_tps: 7.4
-        response_time_s: 34.41
-    qwen3.5-0.8b:
-      model_name: "Qwen3.5 0.8B"
-      quantization: Q4_K_M
-      correct_identification: true  # ✅ Identified in reasoning; no final answer
-      response_complete: false
-      response: |-
-        [Start thinking]
-
-        The user wants a description of the main object in the image.
-
-        1.  **Identify the object:** It's a sphere. It looks like a lemon. The texture is bumpy and textured, not smooth like a plastic ball.
-        2.  **Identify the color:** It's a very vibrant, deep blue. It looks almost plasticized or coated. It contrasts sharply with the earthy tones of the rock and grass.
-        3.  **Identify the shape:** It is perfectly spherical.
-        4.  **Identify the setting:**
-            *   It's sitting on a large, grey rock.
-            *   The rock is on a grassy hill.
-            *   There is a bright, sunny day with a clear blue sky.
-            *   The background is a lush green landscape, slightly out of focus (bokeh), suggesting a landscape park or nature trail.
-
-        **Drafting the
-      notes: "Output ended during thinking; no final answer was produced. Generation throughput includes thinking tokens."
-      performance:
-        prompt_tps: 63.5
-        generation_tps: 21.6
-        response_time_s: 36.26
-```
+**[Vision model CPU benchmarks, blue-lemon test and full responses →](benchmarks/vlms.md)**
 
 **Download provenance:** Granite and Qwen2.5 use publisher-hosted GGUF repositories. Qwen3.5 uses community GGUF weights and a matching Q8_0 visual projector from mradermacher. SmolLM2 variants use quantizations published by QuantFactory and LM Studio Community; SmolVLM2 GGUF and projector come from ggml-org, while the Moondream2 2025 F16 GGUF and matching projector come from ggml-org. LFM2-VL GGUF and projector are published by LiquidAI. All downloads use HTTPS with SHA-256 verification, and no Hugging Face software installation is required. The `granite` alias still resolves to `granite-350m`.
 
@@ -287,7 +197,7 @@ GitHub Actions checks Python unit tests on Windows, macOS and Linux, and perform
 
 ## Licenses
 
-Original code in this repository is licensed under [MIT](LICENSE), and llama.cpp is MIT-licensed. Granite, SmolLM2, SmolVLM2, Qwen2.5, and Moondream2 weights use **Apache-2.0**. LiquidAI LFM2-VL uses the **[LFM Open License v1.0](https://www.liquid.ai/lfm-license)**, with a commercial-use revenue condition. Model weights are downloaded from their respective publishers and are not bundled in this repository.
+Original code in this repository is licensed under [MIT](LICENSE), and llama.cpp is MIT-licensed. Granite, SmolLM2, SmolVLM2, Qwen2.5, Qwen3.5, and Moondream2 weights use **Apache-2.0**. LiquidAI LFM2-VL uses the **[LFM Open License v1.0](https://www.liquid.ai/lfm-license)**, with a commercial-use revenue condition. Model weights are downloaded from their respective publishers and are not bundled in this repository.
 
 ---
 
