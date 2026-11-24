@@ -25,7 +25,7 @@ python run.py qwen3.5-0.8b "Describe the main object, its color, shape, and sett
 
 All vision models download their weights and visual projectors automatically. Use the same image and exact prompt for comparison.
 
-**Qwen3.5 retest pending:** The previous run used the original 192-token default and ended during thinking. The new default for Qwen3.5 is 1024 output tokens (thinking and final answer combined). The command above explicitly sets that budget. The previous measurements and incomplete output remain below until a new run is recorded.
+**Qwen3.5 retest completed:** The original run used the 192-token default and ended during thinking. With a 1024-token budget, the model completed both thinking and its final answer. The table reports the latest completed run; the earlier incomplete run is retained below for reference. Other models use the 192-token default, so the response-time comparison does not control for output length or reasoning budget.
 
 ## Performance and qualitative analysis
 
@@ -34,11 +34,11 @@ All vision models download their weights and visual projectors automatically. Us
 | `smolvlm2-256m` | Q4_K_M | ❌ | Basic; mistakes lemon for a ball | 48.6 tok/s | 65.4 tok/s | 20.15 s |
 | `moondream-2b` | F16 | ✅ | Accurate, concise identification | 40.6 tok/s | 7.4 tok/s | 34.41 s |
 | `lfm2-vl-450m` | Q4_0 | ❌ | **Standout descriptive detail**; recognizes fruit-like shape but invents a pair and plastic material | 157.9 tok/s | 51.4 tok/s | 13.80 s |
-| `qwen3.5-0.8b` | Q4_K_M | ✅ (thinking only) | **Standout explicit reasoning**; recognizes lemon, color and texture; final answer incomplete | 63.5 tok/s | 21.6 tok/s | 36.26 s |
+| `qwen3.5-0.8b` | Q4_K_M | ❌ | **Standout explicit reasoning**; detailed visual analysis, but identifies a blueberry instead of a lemon | 72.7 tok/s | 21.5 tok/s | 57.88 s |
 
-**Qualitative observation:** Qwen3.5 and LFM2-VL stand out for the detail and organization of their visual analysis in these samples. Qwen3.5 explicitly reasons about the object, texture, color and scene; LFM2-VL produces a fluent and detailed scene description quickly. This is not a validated reasoning ranking: LFM2-VL misidentifies the number and nature of the object, while Qwen3.5 never finishes its final answer. Moondream2 gives the most reliable completed identification in this test.
+**Qualitative observation:** Qwen3.5 and LFM2-VL stand out for the detail and organization of their visual analysis in these samples. Qwen3.5 explicitly reasons about the object, texture, color and scene; LFM2-VL produces a fluent and detailed scene description quickly. This is not a validated reasoning ranking: LFM2-VL misidentifies the number and nature of the object, while Qwen3.5's completed retest misidentifies the lemon as a blueberry. Qwen3.5 mentioned a lemon in its earlier incomplete run, but did not confirm it in a final answer. Moondream2 remains the only model with a correct completed identification in these samples.
 
-LFM2-VL has the fastest recorded prompt processing and shortest end-to-end response time. SmolVLM2 has the highest generation throughput. Qwen3.5's generation rate includes thinking tokens, and its timing represents an incomplete run. One image and one run per model do not establish general visual reasoning ability.
+LFM2-VL has the fastest recorded prompt processing and shortest end-to-end response time. SmolVLM2 has the highest generation throughput. Qwen3.5's generation rate and response time include thinking and final-answer generation. Its larger token budget makes end-to-end latency comparisons less controlled. A single image and limited runs do not establish general visual reasoning ability.
 
 ## Individual model outputs
 
@@ -66,6 +66,78 @@ The main object is a pair of blue, plastic fruit spheres. They are round and vib
 
 ### Qwen3.5 0.8B — Q4_K_M
 
+#### Completed retest — 1024-token budget
+
+[Start thinking]
+
+The user wants a description of the main object in the image.
+
+**1. Identify the main object:**
+
+The main object is a blue, spherical object sitting on a rock. It looks like a lemming, a blueberry, or a berry (maybe a 'Mammoth' berry). Given the context of nature and thespecific look, it's most likely a blueberry or a similar berry. However, the prompt just asks for the description, so identifying it as "a blueberry or similar berry" is accurate but not strictly necessary. I should focus on the visual characteristics.
+
+**2. Analyze the color:**
+
+The object is a vibrant, deep blue. It has a textured, almost cracked surface, suggesting it might be fresh or just very weathered, but the paint-like finish suggests it was painted. The color is very saturated.
+
+**3. Analyze the shape:**
+
+The object is clearly round. It has a distinct, somewhat lumpy texture, which gives it a natural shape like a berry, not a perfectly smooth sphere.
+
+**4. Analyze the setting:**
+
+* **Foreground:** A grey, textured rock.
+* **Background:** A grassy field with green grass and some small yellow flowers.
+* **Sky:** A bright blue sky with scattered white clouds.
+* **Lighting:** It looks like a sunny day, casting a shadow beneath the blue object.
+
+**5. Synthesize the description:**
+
+* **Object:** A round, blue fruit (likely a blueberry or berry).
+* **Color:** Vibrant, deep blue.
+* **Shape:** Round with a textured, slightly uneven surface.
+* **Setting:** Sitting on a grey rock in a green grassy field under a blue sky.
+
+**Drafting the response:**
+
+Start with the object: A round, blue fruit (likely a blueberry).  
+Add color details: Vibrant blue.  
+Add shape details: Round with a textured, uneven surface.  
+Add setting details: Sitting on a grey rock in a green grassy field. Mention the sky and shadow for context.
+
+Refining the description based on the visual evidence:
+
+- The object is a blueberry (specifically a 'Mammoth' style or just a blueberry).
+- It is sitting on a grey rock.
+- The background is a green pasture.
+- The sky is blue with white clouds.
+
+Let's write it out clearly.  
+"The main object is a round, blueberry (likely a 'Mammoth' variety) sitting on a rock."  
+"Color: Vibrant, deep blue."  
+"Shape: Round with a textured, uneven surface."  
+"Setting: A grey rock in a green grassy field under a blue sky with white clouds."
+
+This covers all the required points. I will formulate the final output based on this structure.
+
+[End thinking]
+
+**Final answer:**
+
+The image features a single, round object that appears to be a blueberry (specifically a 'Mammoth' variety).
+
+* **Object:** It is a round, blueberry with a textured, uneven surface that suggests it is fresh or perhaps freshly painted.
+* **Color:** It is a vibrant, deep blue that stands out against the green and sky.
+* **Setting:** The object is sitting on a grey, mossy rock in a lush green grassy field. Above it, there is a bright blue sky with scattered white clouds, and a shadow is cast directly beneath the berry.
+
+**Evaluation:**
+
+- Identification: incorrect (blueberry instead of blue lemon).
+- Response: complete.
+- Prompt: 72.7 tok/s; generation: 21.5 tok/s; response time: 57.88 s.
+
+#### Earlier incomplete run — 192-token budget
+
 [Start thinking]
 
 The user wants a description of the main object in the image.
@@ -81,7 +153,7 @@ The user wants a description of the main object in the image.
 
 \*\*Drafting the
 
-- Identification: correct in thinking only; response incomplete.
+- Identification: lemon mentioned in thinking only; no final answer, so completed identification cannot be scored.
 - Prompt: 63.5 tok/s; generation: 21.6 tok/s; response time: 36.26 s.
 
 ## Recording new runs
