@@ -42,27 +42,21 @@ LFM2-VL has the fastest recorded prompt processing and shortest end-to-end respo
 
 ### SmolVLM2 256M Instruct — Q4_K_M
 
-```text
 The object is a blue-colored ball with a smooth texture, likely made from a natural material like concrete or plastic. It's placed on a rock, possibly in a grassy field or a rocky slope, with the sky visible in the background. The colors are vibrant and have a serene, natural aesthetic.
-```
 
 - Identification: incorrect.
 - Prompt: 48.6 tok/s; generation: 65.4 tok/s; response time: 20.15 s.
 
 ### Moondream2 ~2B (2025-04-14) — F16
 
-```text
 The main object is a blue lemon sitting on a rock in a grassy field. The lemon is round in shape and has a vibrant blue color, making it a visually striking and unique scene in the image. The setting appears to be a grassy field or pasture, providing a natural backdrop that complements the bright blue hue of the lemon.
-```
 
 - Identification: correct in the completed response.
 - Prompt: 40.6 tok/s; generation: 7.4 tok/s; response time: 34.41 s.
 
 ### LFM2-VL 450M — Q4_0
 
-```text
 The main object is a pair of blue, plastic fruit spheres. They are round and vibrant blue, standing out against the natural setting. The spheres are positioned on a large gray rock in a field of green grass. The background features a clear blue sky with some clouds and distant mountains. The image has a realistic feel, capturing the blue color of the spheres and the surrounding environment in great detail.
-```
 
 - Identification: incorrect (describes two plastic fruit spheres rather than one blue lemon).
 - Detailed, coherent description of color and setting; some object details are wrong.
@@ -70,7 +64,6 @@ The main object is a pair of blue, plastic fruit spheres. They are round and vib
 
 ### Qwen3.5 0.8B — Q4_K_M
 
-```text
 [Start thinking]
 
 The user wants a description of the main object in the image.
@@ -84,8 +77,7 @@ The user wants a description of the main object in the image.
     *   There is a bright, sunny day with a clear blue sky.
     *   The background is a lush green landscape, slightly out of focus (bokeh), suggesting a landscape park or nature trail.
 
-**Drafting the
-```
+\*\*Drafting the
 
 - Identification: correct in thinking only; response incomplete.
 - Prompt: 63.5 tok/s; generation: 21.6 tok/s; response time: 36.26 s.
